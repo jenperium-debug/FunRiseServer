@@ -1,446 +1,527 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Чат с другом · Работает!</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Побег из дома · Хоррор</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            user-select: none;
         }
-
         body {
-            background: #0d1b2a;
+            margin: 0;
             min-height: 100vh;
+            background: #0b0a0a;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            font-family: 'Courier New', Courier, monospace;
         }
-
-        .chat-card {
-            max-width: 600px;
-            width: 100%;
-            background: #1b2e44;
+        .game-wrapper {
+            background: #1d1616;
+            padding: 20px 20px 25px;
             border-radius: 32px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-            border: 1px solid #3a5a78;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px #4a2e2e inset;
         }
-
-        .chat-header {
+        canvas {
+            display: block;
+            margin: 0 auto;
+            width: 800px;
+            height: 600px;
+            border-radius: 20px;
+            box-shadow: 0 0 0 3px #2f1e1e, 0 10px 30px #000000aa;
+            background: #191212;
+            cursor: crosshair;
+        }
+        .ui-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 1px solid #2f4a62;
+            margin: 16px 10px 0 10px;
+            color: #b7a09a;
+            text-shadow: 0 0 8px #4f2626;
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
         }
-
-        .chat-header h1 {
-            font-size: 1.5rem;
-            color: #e3edf5;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .ui-panel span {
+            background: #251d1d;
+            padding: 8px 22px;
+            border-radius: 60px;
+            border: 1px solid #674a4a;
+            box-shadow: 0 0 12px #3f1f1f;
         }
-
-        .status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            color: #8bb4d0;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .dot.green {
-            background: #2ecc71;
-            box-shadow: 0 0 8px #2ecc71aa;
-            animation: pulse 1.5s infinite;
-        }
-
-        .dot.red {
-            background: #e74c3c;
-            box-shadow: 0 0 8px #e74c3caa;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.8); }
-        }
-
-        #messages {
-            background: #0f1f30;
-            border-radius: 20px;
-            padding: 16px;
-            height: 400px;
-            overflow-y: auto;
-            margin: 16px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border: 1px solid #2a4055;
-        }
-
-        #messages::-webkit-scrollbar {
-            width: 5px;
-        }
-        #messages::-webkit-scrollbar-thumb {
-            background: #3e5f7a;
-            border-radius: 10px;
-        }
-
-        .msg {
-            max-width: 80%;
-            padding: 10px 16px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            animation: fade 0.2s ease;
-        }
-
-        .msg.me {
-            align-self: flex-end;
-            background: #2a6b96;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .msg.other {
-            align-self: flex-start;
-            background: #2a4055;
-            color: #e8f0f7;
-            border-bottom-left-radius: 4px;
-        }
-
-        .msg .name {
-            font-size: 0.7rem;
-            font-weight: 600;
-            opacity: 0.8;
-            margin-bottom: 3px;
-        }
-
-        .msg .text {
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .msg .time {
-            font-size: 0.55rem;
-            opacity: 0.4;
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        @keyframes fade {
-            from { opacity: 0.3; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-area {
-            display: flex;
-            gap: 10px;
-        }
-
-        .input-area input {
-            flex: 1;
-            background: #0f1f30;
-            border: 1px solid #2f4a62;
-            border-radius: 40px;
-            padding: 14px 18px;
-            color: white;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        .input-area input::placeholder {
-            color: #6a8aa8;
-        }
-
-        .input-area input:focus {
-            border-color: #3a8bb9;
-            box-shadow: 0 0 0 3px rgba(58, 139, 185, 0.2);
-        }
-
-        .input-area button {
-            background: #2a6b96;
+        .restart-btn {
+            background: #2f1b1b;
             border: none;
-            border-radius: 40px;
-            padding: 14px 24px;
-            font-weight: 600;
-            color: white;
+            color: #e6d3cb;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 8px 24px;
+            border-radius: 60px;
+            border: 1px solid #975a5a;
+            box-shadow: 0 0 12px #6f2e2e;
             cursor: pointer;
-            transition: 0.2s;
-            white-space: nowrap;
-            font-size: 1rem;
+            transition: all 0.15s;
+            font-family: inherit;
+            letter-spacing: 1px;
         }
-
-        .input-area button:hover {
-            background: #3a7fb0;
+        .restart-btn:hover {
+            background: #4f2b2b;
+            border-color: #c97a7a;
+            color: #fff0e6;
+            box-shadow: 0 0 20px #a33f3f;
             transform: scale(0.97);
         }
-
-        .input-area button:active {
-            transform: scale(0.94);
+        .death-message {
+            color: #d99b8b;
+            font-size: 1.4rem;
+            text-shadow: 0 0 20px #b13b3b;
+            background: #1d1111;
+            padding: 6px 20px;
+            border-radius: 60px;
+            border: 1px solid #a55353;
         }
-
-        .footer {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 12px;
-            font-size: 0.7rem;
-            color: #5a7a96;
-        }
-
-        .footer button {
-            background: none;
-            border: none;
-            color: #5a7a96;
-            cursor: pointer;
-            font-size: 0.7rem;
-            transition: 0.2s;
-            padding: 4px 8px;
-            border-radius: 12px;
-        }
-
-        .footer button:hover {
-            color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
-        }
-
-        .room-info {
-            font-size: 0.65rem;
-            color: #4a6a86;
-            text-align: center;
-            margin-top: 8px;
-            padding: 4px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 20px;
-        }
-
-        .room-info code {
-            background: #0d1b2a;
-            padding: 2px 10px;
-            border-radius: 12px;
-            color: #7ab7e0;
+        @media (max-width: 840px) {
+            canvas { width: 100%; height: auto; aspect-ratio: 4/3; }
+            .game-wrapper { padding: 10px; }
+            .ui-panel { flex-wrap: wrap; gap: 10px; justify-content: center; }
         }
     </style>
 </head>
 <body>
-
-<div class="chat-card">
-    <div class="chat-header">
-        <h1>💬 Чат</h1>
-        <div class="status">
-            <span class="dot" id="statusDot"></span>
-            <span id="statusText">Подключение...</span>
-        </div>
-    </div>
-
-    <div id="messages"></div>
-
-    <div class="input-area">
-        <input type="text" id="input" placeholder="Напишите сообщение..." autocomplete="off" />
-        <button id="sendBtn">➤ Отпр.</button>
-    </div>
-
-    <div class="footer">
-        <span>Вы: <strong id="myName">Загрузка...</strong></span>
-        <button id="clearBtn">✕ Очистить</button>
-    </div>
-    <div class="room-info">
-        🟢 Комната: <code id="roomId">загрузка...</code>
+<div class="game-wrapper">
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="ui-panel">
+        <span id="statusDisplay">🔦 Ищи выход</span>
+        <span id="healthDisplay">❤️ 3</span>
+        <button class="restart-btn" id="restartButton">⟳ Заново</button>
     </div>
 </div>
-
 <script>
-    // ============================================================
-    //  ИСПОЛЬЗУЕМ БЕСПЛАТНЫЙ WEBSOCKET С BROADCAST (рассылка всем)
-    //  Сервер: wss://ws.a0x.xyz (поддерживает broadcast)
-    // ============================================================
+    (function() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-    // Генерируем уникальную комнату (чтобы не пересекаться с другими)
-    // Можно поменять на что-то своё, например, "myroom2026"
-    const ROOM = 'chat_' + Math.random().toString(36).substring(2, 8);
-    document.getElementById('roomId').textContent = ROOM;
+        // ------ Игровые константы ------
+        const PLAYER_RADIUS = 16;
+        const ENEMY_RADIUS = 22;
+        const EXIT_RADIUS = 26;
+        const SPEED = 2.8;
+        const ENEMY_SPEED = 1.1;
 
-    // Имена
-    const names = ['Алекс', 'Мария', 'Денис', 'Екатерина', 'Илья', 'Анна', 'Максим', 'София', 'Артём', 'Ольга', 'Дима', 'Лена'];
-    const myName = names[Math.floor(Math.random() * names.length)];
-    document.getElementById('myName').textContent = myName;
+        // ------ Состояние игры ------
+        let player = { x: 120, y: 120 };
+        let enemies = [];
+        let exit = { x: 710, y: 520 };  // выход в правом нижнем углу
+        let health = 3;
+        let gameActive = true;
+        let win = false;
 
-    // ===== DOM =====
-    const messagesContainer = document.getElementById('messages');
-    const input = document.getElementById('input');
-    const sendBtn = document.getElementById('sendBtn');
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
-    const clearBtn = document.getElementById('clearBtn');
+        // ------ Элементы UI ------
+        const statusDisplay = document.getElementById('statusDisplay');
+        const healthDisplay = document.getElementById('healthDisplay');
 
-    let ws = null;
-    let isConnected = false;
-    let reconnectAttempts = 0;
+        // ------ Клавиши ------
+        const keys = {
+            w: false, a: false, s: false, d: false
+        };
 
-    // ===== ФУНКЦИИ =====
-
-    function setStatus(connected) {
-        isConnected = connected;
-        if (connected) {
-            statusDot.className = 'dot green';
-            statusText.textContent = 'Онлайн';
-        } else {
-            statusDot.className = 'dot red';
-            statusText.textContent = 'Офлайн';
-        }
-    }
-
-    function addMessage(name, text, isMe = false) {
-        const div = document.createElement('div');
-        div.className = `msg ${isMe ? 'me' : 'other'}`;
-
-        const nameSpan = document.createElement('div');
-        nameSpan.className = 'name';
-        nameSpan.textContent = name;
-
-        const textSpan = document.createElement('div');
-        textSpan.className = 'text';
-        textSpan.textContent = text;
-
-        const timeSpan = document.createElement('div');
-        timeSpan.className = 'time';
-        timeSpan.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        div.appendChild(nameSpan);
-        div.appendChild(textSpan);
-        div.appendChild(timeSpan);
-
-        messagesContainer.appendChild(div);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function clearMessages() {
-        messagesContainer.innerHTML = '';
-    }
-
-    function sendMessage(text) {
-        if (!text.trim()) return;
-        if (!isConnected) {
-            alert('❌ Нет подключения к серверу. Подождите...');
-            return;
+        // ------ Враги (стартовые позиции) ------
+        function resetEnemies() {
+            enemies = [
+                { x: 380, y: 150 },
+                { x: 500, y: 400 },
+                { x: 200, y: 480 },
+                { x: 600, y: 200 }
+            ];
         }
 
-        const trimmed = text.trim();
-        // Формат: КОМНАТА|ИМЯ|ТЕКСТ
-        const payload = `${ROOM}|${myName}|${trimmed}`;
-        ws.send(payload);
+        // ------ Полный сброс игры ------
+        function resetGame() {
+            player.x = 120;
+            player.y = 120;
+            health = 3;
+            win = false;
+            gameActive = true;
+            resetEnemies();
+            // выход всегда на месте
+            exit.x = 710;
+            exit.y = 520;
+            updateUI();
+        }
 
-        // Показываем у себя (оптимистично)
-        addMessage(myName, trimmed, true);
-        input.value = '';
-        input.focus();
-    }
-
-    // ===== ПОДКЛЮЧЕНИЕ WEBSOCKET =====
-
-    function connect() {
-        try {
-            // Используем сервер с поддержкой broadcast
-            ws = new WebSocket('wss://ws.a0x.xyz');
-
-            ws.onopen = () => {
-                setStatus(true);
-                reconnectAttempts = 0;
-
-                // Отправляем системное сообщение о входе в комнату
-                const joinMsg = `${ROOM}|🔵 Система|👋 ${myName} присоединился к чату`;
-                ws.send(joinMsg);
-
-                // Приветствие локально
-                if (messagesContainer.children.length === 0) {
-                    addMessage('💡 Система', 'Чат работает! Отправьте сообщение другу.', false);
-                    addMessage('💡 Система', `Комната: ${ROOM}`, false);
+        // ------ Обновление UI ------
+        function updateUI() {
+            healthDisplay.textContent = `❤️ ${health}`;
+            if (!gameActive) {
+                if (win) {
+                    statusDisplay.innerHTML = '🏆 ВЫБРАЛСЯ! 🏆';
+                } else {
+                    statusDisplay.innerHTML = '💀 ТЫ УМЕР... 💀';
                 }
-            };
-
-            ws.onmessage = (event) => {
-                const data = event.data;
-                // Формат: КОМНАТА|ИМЯ|ТЕКСТ
-                const parts = data.split('|');
-                if (parts.length < 3) return;
-
-                const room = parts[0];
-                const name = parts[1];
-                const text = parts.slice(2).join('|'); // на случай если в тексте есть |
-
-                // Игнорируем сообщения из других комнат
-                if (room !== ROOM) return;
-
-                // Игнорируем свои сообщения (уже показаны оптимистично)
-                if (name === myName) return;
-
-                addMessage(name, text, false);
-            };
-
-            ws.onclose = () => {
-                setStatus(false);
-                // Переподключение с экспоненциальной задержкой
-                const delay = Math.min(5000, 1000 * Math.pow(1.5, reconnectAttempts));
-                reconnectAttempts++;
-                setTimeout(connect, delay);
-            };
-
-            ws.onerror = (err) => {
-                console.warn('WebSocket ошибка:', err);
-                setStatus(false);
-                ws.close();
-            };
-
-        } catch (e) {
-            console.error('Ошибка подключения:', e);
-            setStatus(false);
-            setTimeout(connect, 3000);
+            } else {
+                statusDisplay.innerHTML = '🔦 Ищи выход';
+            }
         }
-    }
 
-    // ===== СОБЫТИЯ =====
-
-    sendBtn.addEventListener('click', () => sendMessage(input.value));
-
-    input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            sendMessage(input.value);
+        // ------ Проверка столкновения игрока с врагом ------
+        function checkEnemyCollision() {
+            for (let e of enemies) {
+                const dx = player.x - e.x;
+                const dy = player.y - e.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist < PLAYER_RADIUS + ENEMY_RADIUS) {
+                    return true;
+                }
+            }
+            return false;
         }
-    });
 
-    clearBtn.addEventListener('click', () => {
-        if (confirm('Очистить историю сообщений локально?')) {
-            clearMessages();
-            addMessage('💡 Система', 'История очищена.', false);
+        // ------ Проверка выхода (победа) ------
+        function checkExitReached() {
+            const dx = player.x - exit.x;
+            const dy = player.y - exit.y;
+            return Math.hypot(dx, dy) < PLAYER_RADIUS + EXIT_RADIUS;
         }
-    });
 
-    // ===== СТАРТ =====
+        // ------ Обновление игры (движение, логика) ------
+        function update() {
+            if (!gameActive) return;
 
-    connect();
-    input.focus();
+            // 1. Движение игрока
+            let moveX = 0, moveY = 0;
+            if (keys.w) moveY -= 1;
+            if (keys.s) moveY += 1;
+            if (keys.a) moveX -= 1;
+            if (keys.d) moveX += 1;
+            if (moveX !== 0 || moveY !== 0) {
+                const len = Math.hypot(moveX, moveY);
+                moveX = (moveX / len) * SPEED;
+                moveY = (moveY / len) * SPEED;
+                // Потолок / пол / стены (с учётом радиуса)
+                const newX = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x + moveX));
+                const newY = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y + moveY));
+                player.x = newX;
+                player.y = newY;
+            }
 
-    // Если через 5 секунд нет подключения — покажем подсказку
-    setTimeout(() => {
-        if (!isConnected && messagesContainer.children.length < 3) {
-            addMessage('⚠️ Система', 'Подключение к серверу... Если долго нет связи, обновите страницу.', false);
+            // 2. Проверка столкновения с врагами (урон)
+            if (checkEnemyCollision()) {
+                health -= 1;
+                if (health <= 0) {
+                    health = 0;
+                    gameActive = false;
+                    win = false;
+                    updateUI();
+                    return; // стоп, игра окончена
+                }
+                // Отбрасываем игрока назад (чтобы не было бесконечного урона)
+                // Отодвинуть от ближайшего врага
+                let closest = null;
+                let closestDist = Infinity;
+                for (let e of enemies) {
+                    const d = Math.hypot(player.x - e.x, player.y - e.y);
+                    if (d < closestDist) {
+                        closestDist = d;
+                        closest = e;
+                    }
+                }
+                if (closest) {
+                    const angle = Math.atan2(player.y - closest.y, player.x - closest.x);
+                    const pushX = Math.cos(angle) * 35;
+                    const pushY = Math.sin(angle) * 35;
+                    player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x + pushX));
+                    player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y + pushY));
+                }
+                updateUI();
+                // после отбрасывания ещё раз проверим, не попали ли снова на врага (но даём иммунитет на кадр)
+                // дополнительная защита: если здоровье >0, но коллизия всё ещё есть — отодвигаем ещё
+                if (gameActive && checkEnemyCollision()) {
+                    // повторный отскок
+                    for (let e of enemies) {
+                        const dx = player.x - e.x;
+                        const dy = player.y - e.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < PLAYER_RADIUS + ENEMY_RADIUS && dist > 0.001) {
+                            const overlap = (PLAYER_RADIUS + ENEMY_RADIUS - dist) * 0.8;
+                            const angle = Math.atan2(dy, dx);
+                            player.x += Math.cos(angle) * overlap;
+                            player.y += Math.sin(angle) * overlap;
+                            // границы
+                            player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x));
+                            player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y));
+                        }
+                    }
+                }
+            }
+
+            // 3. Проверка победы (выход)
+            if (checkExitReached()) {
+                gameActive = false;
+                win = true;
+                updateUI();
+                return;
+            }
+
+            // 4. Движение врагов (к игроку, но с шумом)
+            for (let e of enemies) {
+                const dx = player.x - e.x;
+                const dy = player.y - e.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist > 1) {
+                    const step = Math.min(ENEMY_SPEED, dist);
+                    // небольшой случайный джиттер, чтобы не шли точно в ногу
+                    const jitterX = (Math.random() - 0.5) * 0.9;
+                    const jitterY = (Math.random() - 0.5) * 0.9;
+                    const normX = dx / dist + jitterX * 0.15;
+                    const normY = dy / dist + jitterY * 0.15;
+                    const lenNorm = Math.hypot(normX, normY);
+                    if (lenNorm > 0.01) {
+                        const moveX = (normX / lenNorm) * step;
+                        const moveY = (normY / lenNorm) * step;
+                        e.x = Math.min(780 - ENEMY_RADIUS, Math.max(ENEMY_RADIUS, e.x + moveX));
+                        e.y = Math.min(580 - ENEMY_RADIUS, Math.max(ENEMY_RADIUS, e.y + moveY));
+                    }
+                }
+            }
+
+            // (Небольшая проверка после движения врагов: если игрок на враге — урон)
+            if (gameActive && checkEnemyCollision()) {
+                health -= 1;
+                if (health <= 0) {
+                    health = 0;
+                    gameActive = false;
+                    win = false;
+                    updateUI();
+                    return;
+                }
+                // оттолкнуть
+                for (let e of enemies) {
+                    const dx = player.x - e.x;
+                    const dy = player.y - e.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < PLAYER_RADIUS + ENEMY_RADIUS && dist > 0.001) {
+                        const overlap = (PLAYER_RADIUS + ENEMY_RADIUS - dist) * 0.9;
+                        const angle = Math.atan2(dy, dx);
+                        player.x += Math.cos(angle) * overlap;
+                        player.y += Math.sin(angle) * overlap;
+                        player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x));
+                        player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y));
+                    }
+                }
+                updateUI();
+            }
+
+            // Если здоровье упало до 0 (повторная проверка)
+            if (health <= 0 && gameActive) {
+                health = 0;
+                gameActive = false;
+                win = false;
+                updateUI();
+            }
         }
-    }, 5000);
+
+        // ------ Отрисовка ------
+        function draw() {
+            ctx.clearRect(0, 0, 800, 600);
+
+            // --- Пол / текстура (жуткий дом) ---
+            const grad = ctx.createRadialGradient(300, 200, 50, 400, 300, 500);
+            grad.addColorStop(0, '#322121');
+            grad.addColorStop(1, '#120c0c');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 800, 600);
+
+            // линии пола (эффект половиц)
+            ctx.strokeStyle = '#3b2828';
+            ctx.lineWidth = 2.5;
+            for (let i = 0; i < 20; i++) {
+                const y = 30 + i * 30;
+                ctx.beginPath();
+                ctx.moveTo(0, y + Math.sin(i * 0.9) * 8);
+                ctx.lineTo(800, y + Math.cos(i * 0.7) * 8 + 4);
+                ctx.strokeStyle = `rgba(70, 45, 45, ${0.2 + i * 0.015})`;
+                ctx.stroke();
+            }
+
+            // --- Выход (дверь) ---
+            ctx.shadowColor = '#b56f3a';
+            ctx.shadowBlur = 35;
+            ctx.beginPath();
+            ctx.arc(exit.x, exit.y, EXIT_RADIUS, 0, Math.PI * 2);
+            ctx.fillStyle = '#b97c4a';
+            ctx.fill();
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#e6b17e';
+            ctx.font = 'bold 26px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🚪', exit.x, exit.y - 2);
+            ctx.shadowBlur = 0;
+
+            // --- Враги (монстры) ---
+            for (let e of enemies) {
+                // тень
+                ctx.shadowColor = '#b33a3a';
+                ctx.shadowBlur = 40;
+                // тело
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, ENEMY_RADIUS, 0, Math.PI * 2);
+                const grd = ctx.createRadialGradient(e.x-8, e.y-8, 6, e.x, e.y, ENEMY_RADIUS+4);
+                grd.addColorStop(0, '#691f1f');
+                grd.addColorStop(0.7, '#2d0d0d');
+                ctx.fillStyle = grd;
+                ctx.fill();
+                // глаза
+                ctx.shadowBlur = 12;
+                ctx.fillStyle = '#f0d8b0';
+                ctx.beginPath();
+                ctx.arc(e.x-10, e.y-7, 7, 0, Math.PI*2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x+10, e.y-7, 7, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#1f0808';
+                ctx.beginPath();
+                ctx.arc(e.x-12, e.y-5, 3.5, 0, Math.PI*2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x+8, e.y-5, 3.5, 0, Math.PI*2);
+                ctx.fill();
+                // зрачки (красные)
+                ctx.fillStyle = '#d64444';
+                ctx.shadowBlur = 20;
+                ctx.beginPath();
+                ctx.arc(e.x-14, e.y-9, 1.8, 0, Math.PI*2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x+6, e.y-9, 1.8, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // --- Игрок (фонарик) ---
+            ctx.shadowColor = '#bd8a4b';
+            ctx.shadowBlur = 40;
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, PLAYER_RADIUS, 0, Math.PI * 2);
+            const pGrad = ctx.createRadialGradient(player.x-6, player.y-6, 5, player.x, player.y, PLAYER_RADIUS+6);
+            pGrad.addColorStop(0, '#dab88b');
+            pGrad.addColorStop(0.8, '#7a4d2a');
+            ctx.fillStyle = pGrad;
+            ctx.fill();
+            // глаза игрока (белые)
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = '#f0eee6';
+            ctx.beginPath();
+            ctx.arc(player.x-7, player.y-4, 5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(player.x+7, player.y-4, 5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = '#1f1a14';
+            ctx.beginPath();
+            ctx.arc(player.x-9, player.y-2, 2.5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(player.x+5, player.y-2, 2.5, 0, Math.PI*2);
+            ctx.fill();
+            // свет фонарика (конус)
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(255, 200, 100, 0.08)';
+            ctx.beginPath();
+            ctx.moveTo(player.x, player.y);
+            ctx.arc(player.x, player.y, 140, -0.9, 0.9);
+            ctx.fill();
+
+            // --- Детали: кровь на полу (декор) ---
+            ctx.shadowBlur = 0;
+            for (let i=0; i<6; i++) {
+                ctx.fillStyle = `rgba(110, 20, 20, ${0.05 + i*0.02})`;
+                ctx.beginPath();
+                ctx.arc(70 + i*130, 500 + Math.sin(i)*18, 12 + i*5, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Если игра окончена — затемнение и текст
+            if (!gameActive) {
+                ctx.fillStyle = 'rgba(0,0,0,0.55)';
+                ctx.fillRect(0, 0, 800, 600);
+                ctx.font = 'bold 52px "Courier New", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowBlur = 30;
+                if (win) {
+                    ctx.fillStyle = '#d9c89e';
+                    ctx.shadowColor = '#e8b86a';
+                    ctx.fillText('🔓 ВЫБРАЛСЯ', 400, 260);
+                    ctx.font = '24px monospace';
+                    ctx.fillStyle = '#c7b29b';
+                    ctx.fillText('Свобода...', 400, 350);
+                } else {
+                    ctx.fillStyle = '#d3a08a';
+                    ctx.shadowColor = '#bd3f3f';
+                    ctx.fillText('💀 ПОГИБ 💀', 400, 260);
+                    ctx.font = '24px monospace';
+                    ctx.fillStyle = '#b28070';
+                    ctx.fillText('Тьма поглотила тебя...', 400, 350);
+                }
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // ------ Игровой цикл ------
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ------ Обработка клавиш ------
+        function keyDownHandler(e) {
+            const key = e.key.toLowerCase();
+            if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+                e.preventDefault();
+                keys[key] = true;
+            }
+            // стрелки тоже (для удобства)
+            if (e.key === 'ArrowUp') { e.preventDefault(); keys.w = true; }
+            if (e.key === 'ArrowDown') { e.preventDefault(); keys.s = true; }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); keys.a = true; }
+            if (e.key === 'ArrowRight') { e.preventDefault(); keys.d = true; }
+        }
+        function keyUpHandler(e) {
+            const key = e.key.toLowerCase();
+            if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
+                e.preventDefault();
+                keys[key] = false;
+            }
+            if (e.key === 'ArrowUp') { e.preventDefault(); keys.w = false; }
+            if (e.key === 'ArrowDown') { e.preventDefault(); keys.s = false; }
+            if (e.key === 'ArrowLeft') { e.preventDefault(); keys.a = false; }
+            if (e.key === 'ArrowRight') { e.preventDefault(); keys.d = false; }
+        }
+        window.addEventListener('keydown', keyDownHandler);
+        window.addEventListener('keyup', keyUpHandler);
+
+        // ------ Кнопка рестарта ------
+        document.getElementById('restartButton').addEventListener('click', () => {
+            resetGame();
+            updateUI();
+        });
+
+        // ------ Инициализация ------
+        resetGame();
+        updateUI();
+        gameLoop();
+
+        // защита от скролла при стрелках
+        window.addEventListener('keydown', (e) => {
+            if (e.key.startsWith('Arrow')) e.preventDefault();
+        }, { passive: false });
+    })();
 </script>
-
 </body>
 </html>
