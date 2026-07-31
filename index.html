@@ -33,7 +33,6 @@
             flex-direction: column;
         }
         
-        /* Шапка */
         .header {
             padding: 20px 24px;
             background: #222;
@@ -69,7 +68,6 @@
             background: #e74c3c;
         }
         
-        /* Окно сообщений */
         .messages {
             flex: 1;
             padding: 16px 20px;
@@ -131,7 +129,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Панель ввода */
         .input-area {
             padding: 12px 16px 16px;
             background: #1a1a1a;
@@ -187,7 +184,6 @@
             cursor: not-allowed;
         }
         
-        /* Формы входа/регистрации */
         .auth-form {
             flex: 1;
             display: flex;
@@ -260,6 +256,17 @@
             color: #e74c3c;
             font-size: 13px;
             text-align: center;
+            min-height: 20px;
+        }
+        
+        .auth-form .debug {
+            color: #666;
+            font-size: 11px;
+            text-align: center;
+            word-break: break-all;
+            background: #0a0a0a;
+            padding: 8px;
+            border-radius: 8px;
         }
         
         .hidden {
@@ -301,7 +308,6 @@
             padding: 4px;
         }
         
-        /* Скролл */
         .messages::-webkit-scrollbar {
             width: 4px;
         }
@@ -317,7 +323,6 @@
 <body>
 
 <div class="container" id="app">
-    <!-- Шапка -->
     <div class="header" id="header" style="display:none;">
         <div>
             <h1>💬 Мессенджер</h1>
@@ -329,42 +334,78 @@
         </div>
     </div>
     
-    <!-- Сообщения -->
     <div class="messages" id="messages">
         <div class="empty">Авторизуйтесь, чтобы начать общение</div>
     </div>
     
-    <!-- Статус звонка -->
     <div class="status" id="callStatus"></div>
     
-    <!-- Ввод -->
     <div class="input-area" id="inputArea" style="display:none;">
         <textarea id="msgInput" rows="1" placeholder="Введите сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
         <button class="btn-send" id="sendBtn" onclick="sendMessage()">Отправить</button>
     </div>
     
-    <!-- Форма авторизации -->
     <div class="auth-form" id="authForm">
-        <h2 id="authTitle">Вход</h2>
+        <h2 id="authTitle">Регистрация</h2>
         <input type="text" id="authUsername" placeholder="Имя пользователя" autocomplete="username">
         <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
         <div class="error" id="authError"></div>
-        <button class="btn-auth" id="authBtn" onclick="auth()">Войти</button>
+        <div class="debug" id="debugInfo">🔍 Проверка соединения...</div>
+        <button class="btn-auth" id="authBtn" onclick="auth()">Зарегистрироваться</button>
         <div class="switch">
-            <span id="switchText">Нет аккаунта?</span>
-            <a id="switchLink" onclick="toggleAuth()">Зарегистрироваться</a>
+            <span id="switchText">Уже есть аккаунт?</span>
+            <a id="switchLink" onclick="toggleAuth()">Войти</a>
         </div>
     </div>
 </div>
 
 <script>
-// ============ КОНФИГУРАЦИЯ ============
-// ⚠️ ИЗМЕНИТЕ ЭТУ ССЫЛКУ НА ВАШ ХОСТИНГ!
-const API_URL = window.location.origin + '/api.php';
+// ============ АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ API ============
+// Пытаемся найти api.php в текущей папке или родительской
+let API_URL = '';
+
+function detectApiUrl() {
+    const paths = [
+        window.location.pathname.replace(/\/[^/]*$/, '/') + 'api.php',
+        window.location.pathname.replace(/\/[^/]*$/, '/') + '../api.php',
+        '/api.php',
+        'api.php'
+    ];
+    
+    // Используем текущий URL как базовый
+    const base = window.location.origin;
+    
+    // Пробуем разные пути
+    for (let p of paths) {
+        const testUrl = base + p;
+        // Проверяем через fetch
+        fetch(testUrl, { method: 'HEAD' })
+            .then(() => {
+                API_URL = testUrl;
+                document.getElementById('debugInfo').textContent = '✅ Сервер найден: ' + API_URL;
+                document.getElementById('debugInfo').style.color = '#2ecc71';
+            })
+            .catch(() => {
+                // Пробуем следующий
+            });
+    }
+    
+    // Если ничего не нашлось, используем относительный путь
+    setTimeout(() => {
+        if (!API_URL) {
+            API_URL = window.location.href.replace(/\/[^/]*$/, '/') + 'api.php';
+            document.getElementById('debugInfo').textContent = '⚠️ Используем: ' + API_URL;
+            document.getElementById('debugInfo').style.color = '#f39c12';
+        }
+    }, 1000);
+}
+
+// Запускаем поиск
+detectApiUrl();
 
 // ============ СОСТОЯНИЕ ============
 let currentUser = null;
-let isLogin = true;
+let isLogin = false; // по умолчанию регистрация
 let pollInterval = null;
 let callActive = false;
 let peerConnection = null;
@@ -384,13 +425,21 @@ async function auth() {
     const username = document.getElementById('authUsername').value.trim();
     const password = document.getElementById('authPassword').value.trim();
     const errorEl = document.getElementById('authError');
+    const debugEl = document.getElementById('debugInfo');
     
     if (!username || !password) {
         errorEl.textContent = 'Заполните все поля';
         return;
     }
     
+    if (!API_URL) {
+        errorEl.textContent = '❌ Не удалось найти сервер. Проверьте, что api.php загружен на хостинг!';
+        return;
+    }
+    
     const action = isLogin ? 'login' : 'register';
+    debugEl.textContent = '🔄 Отправка запроса к ' + API_URL + '...';
+    debugEl.style.color = '#f39c12';
     
     try {
         const resp = await fetch(API_URL, {
@@ -400,6 +449,8 @@ async function auth() {
         });
         
         const data = await resp.json();
+        debugEl.textContent = '📡 Ответ: ' + JSON.stringify(data);
+        debugEl.style.color = '#888';
         
         if (data.success) {
             currentUser = username;
@@ -408,18 +459,23 @@ async function auth() {
             document.getElementById('inputArea').style.display = 'flex';
             document.getElementById('userDisplay').textContent = '👤 ' + username;
             document.getElementById('messages').innerHTML = '<div class="empty">Добро пожаловать! Начинайте общение.</div>';
+            errorEl.textContent = '';
+            debugEl.textContent = '✅ Авторизован как ' + username;
+            debugEl.style.color = '#2ecc71';
             
-            // Загружаем историю
             loadMessages();
-            // Запускаем опрос
             if (pollInterval) clearInterval(pollInterval);
             pollInterval = setInterval(loadMessages, 2000);
         } else {
             errorEl.textContent = data.error || 'Ошибка';
+            debugEl.textContent = '❌ ' + (data.error || 'Неизвестная ошибка');
+            debugEl.style.color = '#e74c3c';
         }
     } catch (e) {
-        errorEl.textContent = 'Ошибка соединения с сервером';
-        console.error(e);
+        errorEl.textContent = '❌ Ошибка соединения с сервером';
+        debugEl.textContent = '❌ Ошибка: ' + e.message + ' (URL: ' + API_URL + ')';
+        debugEl.style.color = '#e74c3c';
+        console.error('Ошибка:', e);
     }
 }
 
@@ -436,6 +492,11 @@ function logout() {
     document.getElementById('messages').innerHTML = '<div class="empty">Авторизуйтесь, чтобы начать общение</div>';
     document.getElementById('authPassword').value = '';
     document.getElementById('authError').textContent = '';
+    isLogin = false;
+    document.getElementById('authTitle').textContent = 'Регистрация';
+    document.getElementById('authBtn').textContent = 'Зарегистрироваться';
+    document.getElementById('switchText').textContent = 'Уже есть аккаунт?';
+    document.getElementById('switchLink').textContent = 'Войти';
 }
 
 // ============ СООБЩЕНИЯ ============
@@ -509,12 +570,11 @@ async function loadMessages() {
     }
 }
 
-// ============ ЗВОНКИ (WebRTC) ============
+// ============ ЗВОНКИ ============
 async function makeCall() {
     if (!currentUser) return;
     
     if (callActive) {
-        // Завершить звонок
         if (peerConnection) peerConnection.close();
         if (localStream) localStream.getTracks().forEach(t => t.stop());
         callActive = false;
@@ -525,10 +585,8 @@ async function makeCall() {
     }
     
     try {
-        // Запрашиваем доступ к микрофону
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         
-        // Создаём PeerConnection
         const config = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' }
@@ -536,16 +594,13 @@ async function makeCall() {
         };
         peerConnection = new RTCPeerConnection(config);
         
-        // Добавляем аудио-трек
         localStream.getTracks().forEach(track => {
             peerConnection.addTrack(track, localStream);
         });
         
-        // Создаём оффер
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
         
-        // Отправляем оффер на сервер
         const resp = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -562,8 +617,6 @@ async function makeCall() {
             document.getElementById('callStatus').textContent = '📞 Идёт вызов... Ожидайте ответа';
             document.getElementById('callBtn').textContent = '🔴 Завершить';
             document.getElementById('callBtn').className = 'btn-call end';
-            
-            // Ждём ответа
             waitForAnswer();
         }
     } catch (e) {
@@ -573,7 +626,6 @@ async function makeCall() {
 }
 
 async function waitForAnswer() {
-    // Проверяем каждые 2 секунды, не пришёл ли ответ
     const checkInterval = setInterval(async () => {
         if (!callActive) {
             clearInterval(checkInterval);
@@ -596,7 +648,7 @@ async function waitForAnswer() {
     }, 2000);
 }
 
-// ============ АВТО-РАЗМЕР ТЕКСТАРИИ ============
+// ============ АВТО-РАЗМЕР ============
 document.getElementById('msgInput').addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 80) + 'px';
@@ -604,8 +656,8 @@ document.getElementById('msgInput').addEventListener('input', function() {
 
 // ============ ЗАПУСК ============
 console.log('📱 Мессенджер запущен');
-console.log('ℹ️ API URL:', API_URL);
-console.log('⚠️ Убедитесь, что файл api.php загружен на хостинг!');
+console.log('📍 Путь к странице:', window.location.href);
+console.log('⚠️ Убедитесь, что api.php загружен на хостинг в ту же папку!');
 </script>
 </body>
 </html>
