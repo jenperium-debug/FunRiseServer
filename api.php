@@ -1,6 +1,5 @@
 <?php
 // ============ НАСТРОЙКИ ============
-// ⚠️ ИЗМЕНИТЕ ЭТИ ДАННЫЕ НА СВОИ!
 $DB_FILE = 'messages.json';
 $USERS_FILE = 'users.json';
 
@@ -23,7 +22,7 @@ function getUser($username) {
     return null;
 }
 
-// ============ ОБРАБОТКА ЗАПРОСОВ ============
+// ============ ОБРАБОТКА ============
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
@@ -35,21 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// ============ GET ЗАПРОСЫ ============
+// ============ GET ============
 if ($method === 'GET') {
     $action = $_GET['action'] ?? '';
     $user = $_GET['user'] ?? '';
     
-    // Получение сообщений
     if ($action === 'get') {
         $messages = loadData($DB_FILE);
-        // Возвращаем только последние 100 сообщений
         $messages = array_slice($messages, -100);
         echo json_encode(['success' => true, 'messages' => $messages]);
         exit;
     }
     
-    // Проверка статуса звонка
     if ($action === 'check_call') {
         $calls = loadData('calls.json');
         if (isset($calls[$user])) {
@@ -63,12 +59,12 @@ if ($method === 'GET') {
     }
 }
 
-// ============ POST ЗАПРОСЫ ============
+// ============ POST ============
 if ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     $action = $input['action'] ?? '';
     
-    // ===== РЕГИСТРАЦИЯ =====
+    // РЕГИСТРАЦИЯ
     if ($action === 'register') {
         $username = trim($input['username'] ?? '');
         $password = trim($input['password'] ?? '');
@@ -101,7 +97,7 @@ if ($method === 'POST') {
         exit;
     }
     
-    // ===== ВХОД =====
+    // ВХОД
     if ($action === 'login') {
         $username = trim($input['username'] ?? '');
         $password = trim($input['password'] ?? '');
@@ -116,7 +112,7 @@ if ($method === 'POST') {
         exit;
     }
     
-    // ===== ОТПРАВКА СООБЩЕНИЯ =====
+    // ОТПРАВКА
     if ($action === 'send') {
         $username = trim($input['username'] ?? '');
         $message = trim($input['message'] ?? '');
@@ -138,7 +134,7 @@ if ($method === 'POST') {
         exit;
     }
     
-    // ===== ЗВОНОК =====
+    // ЗВОНОК
     if ($action === 'call') {
         $username = trim($input['username'] ?? '');
         $offer = $input['offer'] ?? '';
@@ -148,7 +144,6 @@ if ($method === 'POST') {
             exit;
         }
         
-        // Сохраняем оффер для друга
         $calls = loadData('calls.json');
         $calls[$username] = $offer;
         saveData('calls.json', $calls);
@@ -158,5 +153,4 @@ if ($method === 'POST') {
     }
 }
 
-// ============ ЕСЛИ НИЧЕГО НЕ ПОДОШЛО ============
 echo json_encode(['success' => false, 'error' => 'Неизвестный запрос']);
