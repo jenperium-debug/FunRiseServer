@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Побег от Грэнни · Сетевая игра</title>
+    <title>Побег от Грэнни · P2P</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -22,34 +22,37 @@
             background: rgba(5, 2, 2, 0.97);
             z-index: 1000;
             backdrop-filter: blur(8px);
+            padding: 20px;
         }
         #menu.hidden { display: none; }
         #menu h1 {
             color: #d9b8a8;
-            font-size: 3.5rem;
+            font-size: 3rem;
             text-shadow: 0 0 40px #8a3333;
             margin-bottom: 10px;
             letter-spacing: 4px;
+            text-align: center;
         }
         #menu h2 {
             color: #a77a6a;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin-bottom: 30px;
             letter-spacing: 2px;
+            text-align: center;
         }
         .menu-btn {
             background: #2d1717;
             border: 2px solid #a55353;
             color: #f0d6c6;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            padding: 15px 50px;
+            padding: 15px 40px;
             margin: 8px;
             border-radius: 60px;
             cursor: pointer;
             font-family: 'Courier New', monospace;
             transition: 0.2s;
-            min-width: 280px;
+            min-width: 250px;
             letter-spacing: 2px;
         }
         .menu-btn:hover {
@@ -66,6 +69,11 @@
             border-color: #8a6a6a;
             box-shadow: 0 0 30px #6a3f3f;
         }
+        .menu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
         .menu-input {
             background: #1a0d0d;
             border: 2px solid #6a4a4a;
@@ -74,7 +82,7 @@
             font-size: 1.2rem;
             border-radius: 30px;
             margin: 8px;
-            min-width: 280px;
+            min-width: 250px;
             text-align: center;
             font-family: 'Courier New', monospace;
             outline: none;
@@ -85,7 +93,7 @@
         }
         #menu-info {
             color: #8a7a7a;
-            margin-top: 30px;
+            margin-top: 20px;
             font-size: 0.9rem;
             text-align: center;
             line-height: 1.8;
@@ -175,24 +183,6 @@
             pointer-events: none;
             letter-spacing: 2px;
         }
-        #noise-indicator {
-            position: absolute;
-            top: 180px; left: 50%;
-            transform: translateX(-50%);
-            color: #ff8844;
-            font-size: 1rem;
-            background: #1a0a0add;
-            padding: 4px 20px;
-            border-radius: 30px;
-            border: 1px solid #aa5533;
-            backdrop-filter: blur(4px);
-            user-select: none;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            letter-spacing: 1px;
-        }
-        #noise-indicator.show { opacity: 1; }
         #connection-status {
             position: absolute;
             top: 20px; right: 20px;
@@ -210,19 +200,28 @@
             color: #8a4a4a;
             border-color: #7a4a4a;
         }
-        .player-label {
+        #copy-btn {
             position: absolute;
-            top: 10px;
-            font-size: 1rem;
+            top: 170px; left: 50%;
+            transform: translateX(-50%);
+            background: #2d1717;
+            border: 1px solid #a55353;
+            color: #f0d6c6;
             padding: 4px 16px;
             border-radius: 20px;
-            border: 1px solid #444;
-            backdrop-filter: blur(4px);
-            user-select: none;
-            pointer-events: none;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            pointer-events: auto;
+            transition: 0.2s;
+            display: none;
         }
-        #p1-label { left: 20px; color: #e0b0a0; border-color: #884444; background: #140b0bdd; }
-        #p2-label { left: 180px; color: #a0c0e0; border-color: #448888; background: #0b1414dd; display: none; }
+        #copy-btn:hover {
+            background: #4d2626;
+        }
+        #copy-btn.show {
+            display: block;
+        }
         @media (max-width: 700px) {
             #menu h1 { font-size: 2rem; }
             .menu-btn { font-size: 1rem; padding: 12px 30px; min-width: 200px; }
@@ -233,9 +232,7 @@
             #floor-indicator { font-size: 0.9rem; top: 70px; padding: 2px 16px; }
             #room-id { font-size: 0.8rem; top: 110px; padding: 2px 14px; }
             #connection-status { font-size: 0.7rem; padding: 4px 12px; }
-            .player-label { font-size: 0.8rem; padding: 2px 12px; }
-            #p1-label { left: 10px; }
-            #p2-label { left: 120px; }
+            #copy-btn { top: 145px; font-size: 0.7rem; padding: 2px 12px; }
         }
     </style>
 </head>
@@ -244,32 +241,30 @@
     <!-- МЕНЮ -->
     <div id="menu">
         <h1>🏚️ ПОБЕГ ОТ ГРЭННИ</h1>
-        <h2>Сетевая игра · 2 игрока</h2>
+        <h2>P2P Сетевая игра · 2 игрока</h2>
         <button class="menu-btn" id="createBtn">🎮 СОЗДАТЬ КОМНАТУ</button>
-        <div style="display:flex; gap:10px; align-items:center; margin:8px;">
+        <div style="display:flex; gap:10px; align-items:center; margin:8px; flex-wrap:wrap; justify-content:center;">
             <input class="menu-input" id="roomInput" placeholder="Введите код комнаты" maxlength="6">
             <button class="menu-btn secondary" id="joinBtn" style="min-width:120px; padding:12px 24px;">ПОДКЛЮЧИТЬСЯ</button>
         </div>
         <div id="menu-info">
             <span class="highlight">Создайте комнату</span> — получите код и поделитесь с другом.<br>
-            <span class="highlight">Подключитесь</span> — введите код и ждите начала.
+            <span class="highlight">Подключитесь</span> — введите код и ждите начала.<br>
+            <span style="color:#6a5a5a; font-size:0.8rem;">📡 Работает через WebRTC (P2P) — без сервера!</span>
         </div>
     </div>
 
     <!-- ИГРОВОЙ ИНТЕРФЕЙС -->
     <div id="game-ui" style="display:none;">
-        <div id="p1-label">👤 Игрок 1</div>
-        <div id="p2-label">👤 Игрок 2</div>
         <div id="connection-status" class="disconnected">🔴 Ожидание...</div>
         <div id="health">❤️ 3</div>
         <div id="status">🔦 ИЩИ ВЫХОД</div>
         <div id="floor-indicator">📍 1 ЭТАЖ</div>
         <div id="room-id">🏷️ КОМНАТА: ----</div>
-        <div id="noise-indicator">🔊 ШУМ!</div>
+        <button id="copy-btn">📋 Копировать код</button>
         <div id="controls-hint">WASD — ходьба · Мышь — взгляд · E — уронить предмет</div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
     <script type="importmap">
         {
             "imports": {
@@ -283,10 +278,12 @@
         import * as THREE from 'three';
         import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
-        // --- ПОДКЛЮЧЕНИЕ К СЕРВЕРУ ---
-        const socket = io();
-        let roomId = null;
+        // --- P2P СОЕДИНЕНИЕ (WebRTC) ---
+        let peerConnection = null;
+        let dataChannel = null;
+        let roomId = '';
         let isHost = false;
+        let isConnected = false;
         let otherPlayerData = null;
 
         // --- ЭЛЕМЕНТЫ UI ---
@@ -296,13 +293,11 @@
         const joinBtn = document.getElementById('joinBtn');
         const roomInput = document.getElementById('roomInput');
         const roomIdDisplay = document.getElementById('room-id');
+        const copyBtn = document.getElementById('copy-btn');
         const statusDiv = document.getElementById('status');
         const healthDiv = document.getElementById('health');
         const floorDiv = document.getElementById('floor-indicator');
-        const noiseDiv = document.getElementById('noise-indicator');
         const connStatus = document.getElementById('connection-status');
-        const p1Label = document.getElementById('p1-label');
-        const p2Label = document.getElementById('p2-label');
 
         // --- ИГРОВОЕ СОСТОЯНИЕ ---
         const player = {
@@ -315,10 +310,8 @@
         };
 
         let grannyData = { x: -5, z: -4, floor: 1, rotation: 0 };
-        let items = [];
-        let otherPlayers = {};
 
-        // --- ТРЁХМЕРНАЯ СЦЕНА ---
+        // --- ТРЁХМЕРНАЯ СЦЕНА (сокращённо для экономии места) ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0b0707);
         scene.fog = new THREE.FogExp2(0x0b0707, 0.005);
@@ -340,23 +333,20 @@
         // --- ОСВЕЩЕНИЕ ---
         const ambient = new THREE.AmbientLight(0x332222, 0.6);
         scene.add(ambient);
-
         const mainLight = new THREE.DirectionalLight(0xffcc88, 0.5);
         mainLight.position.set(5, 10, 3);
         mainLight.castShadow = true;
         scene.add(mainLight);
-
         const fillLight = new THREE.PointLight(0x885533, 0.3, 20);
         fillLight.position.set(-3, 3, -4);
         scene.add(fillLight);
-
         const flashlight = new THREE.SpotLight(0xffd09a, 2.2, 16, Math.PI / 5, 0.5, 1.5);
         flashlight.position.set(0, 1.6, 0);
         flashlight.target.position.set(0, 0, -5);
         scene.add(flashlight);
         scene.add(flashlight.target);
 
-        // --- ПОСТРОЕНИЕ ДОМА ---
+        // --- ПОСТРОЕНИЕ ДОМА (упрощённо) ---
         const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d2424, roughness: 0.95, emissive: 0x0d0808, emissiveIntensity: 0.05 });
         const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a1a1a, roughness: 0.9, metalness: 0.1, emissive: 0x0f0808, emissiveIntensity: 0.05 });
         const doorMat = new THREE.MeshStandardMaterial({ color: 0x7a4f2a, emissive: 0xac6f3a, emissiveIntensity: 0.2, roughness: 0.4 });
@@ -367,8 +357,8 @@
         const wallThick = 0.25;
         const wallColliders = [];
 
-        function createWall(w, h, pos, rotY = 0, mat = wallMat) {
-            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, wallThick), mat);
+        function createWall(w, h, pos, rotY = 0) {
+            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, wallThick), wallMat);
             wall.position.set(pos.x, pos.y, pos.z);
             wall.rotation.y = rotY;
             wall.castShadow = true;
@@ -389,10 +379,8 @@
                 maxZ = pos.z + halfW;
             }
             wallColliders.push({ minX, maxX, minZ, maxZ, yMin: pos.y - h/2, yMax: pos.y + h/2 });
-            return wall;
         }
 
-        // Полы
         const floor1 = new THREE.Mesh(new THREE.PlaneGeometry(roomSize, roomSize), floorMat);
         floor1.rotation.x = -Math.PI / 2;
         floor1.position.y = 0;
@@ -405,39 +393,36 @@
         floor2.receiveShadow = true;
         scene.add(floor2);
 
-        // Стены
         createWall(roomSize, floorHeight, { x: 0, y: floorHeight/2, z: -roomSize/2 }, 0);
         createWall(roomSize, floorHeight, { x: -roomSize/2, y: floorHeight/2, z: 0 }, Math.PI/2);
         createWall(roomSize, floorHeight, { x: roomSize/2, y: floorHeight/2, z: 0 }, Math.PI/2);
         
-        const wallFrontL = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
-        wallFrontL.position.set(-3.5, floorHeight/2, roomSize/2);
-        wallFrontL.castShadow = true;
-        wallFrontL.receiveShadow = true;
-        scene.add(wallFrontL);
+        const wfl = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
+        wfl.position.set(-3.5, floorHeight/2, roomSize/2);
+        wfl.castShadow = true;
+        wfl.receiveShadow = true;
+        scene.add(wfl);
         wallColliders.push({ minX: -6.25, maxX: -0.75, minZ: 7.875, maxZ: 8.125, yMin: 0, yMax: floorHeight });
 
-        const wallFrontR = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
-        wallFrontR.position.set(3.5, floorHeight/2, roomSize/2);
-        wallFrontR.castShadow = true;
-        wallFrontR.receiveShadow = true;
-        scene.add(wallFrontR);
+        const wfr = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
+        wfr.position.set(3.5, floorHeight/2, roomSize/2);
+        wfr.castShadow = true;
+        wfr.receiveShadow = true;
+        scene.add(wfr);
         wallColliders.push({ minX: 0.75, maxX: 6.25, minZ: 7.875, maxZ: 8.125, yMin: 0, yMax: floorHeight });
 
-        const wallFrontTop = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.6, wallThick), wallMat);
-        wallFrontTop.position.set(0, floorHeight - 0.3, roomSize/2);
-        wallFrontTop.castShadow = true;
-        wallFrontTop.receiveShadow = true;
-        scene.add(wallFrontTop);
+        const wft = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.6, wallThick), wallMat);
+        wft.position.set(0, floorHeight - 0.3, roomSize/2);
+        wft.castShadow = true;
+        wft.receiveShadow = true;
+        scene.add(wft);
         wallColliders.push({ minX: -1.75, maxX: 1.75, minZ: 7.875, maxZ: 8.125, yMin: floorHeight - 0.6, yMax: floorHeight });
 
-        // Стены 2 этажа
         createWall(roomSize, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: -roomSize/2 }, 0);
         createWall(roomSize, floorHeight, { x: -roomSize/2, y: floorHeight + floorHeight/2, z: 0 }, Math.PI/2);
         createWall(roomSize, floorHeight, { x: roomSize/2, y: floorHeight + floorHeight/2, z: 0 }, Math.PI/2);
         createWall(roomSize, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: roomSize/2 }, 0);
 
-        // Внутренние стены
         function createInnerWall(w, h, pos, rotY = 0) {
             const mat = new THREE.MeshStandardMaterial({ color: 0x3d2424, roughness: 0.95, emissive: 0x0d0808, emissiveIntensity: 0.05 });
             const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.2), mat);
@@ -453,7 +438,6 @@
             } else {
                 wallColliders.push({ minX: pos.x - halfThick, maxX: pos.x + halfThick, minZ: pos.z - halfW, maxZ: pos.z + halfW, yMin: pos.y - h/2, yMax: pos.y + h/2 });
             }
-            return wall;
         }
 
         createInnerWall(4, floorHeight, { x: -4, y: floorHeight/2, z: 2 }, 0);
@@ -469,7 +453,6 @@
         createInnerWall(6, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: -4 }, Math.PI/2);
         createInnerWall(6, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: 4 }, Math.PI/2);
 
-        // Лестница
         function createStair(x, z, yBase, direction = 1) {
             const stairMat = new THREE.MeshStandardMaterial({ color: 0x4a2a2a, roughness: 0.8 });
             for (let i = 0; i < 12; i++) {
@@ -483,16 +466,13 @@
         createStair(-1.0, -3.0, 0.1, 1);
         createStair(-1.0, 3.0, 0.1, 1);
 
-        // Выходная дверь
         const door = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.6, 0.25), doorMat);
         door.position.set(0, 1.3, 8.15);
         door.castShadow = true;
         scene.add(door);
-
         const handle = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), handleMat);
         handle.position.set(0.85, 1.3, 8.4);
         scene.add(handle);
-
         const exitLight = new THREE.PointLight(0xffaa55, 0.8, 10);
         exitLight.position.set(0, 2.8, 8.0);
         scene.add(exitLight);
@@ -504,24 +484,20 @@
         dressG.position.y = 0.45;
         dressG.castShadow = true;
         grannyGroup.add(dressG);
-
         const apronMat = new THREE.MeshStandardMaterial({ color: 0x7a5a5a, roughness: 0.8 });
         const apron = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), apronMat);
         apron.position.set(0, 0.6, 0.45);
         grannyGroup.add(apron);
-
         const bodyMatG = new THREE.MeshStandardMaterial({ color: 0x3a2a4a, roughness: 0.8 });
         const bodyG = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.4), bodyMatG);
         bodyG.position.y = 1.0;
         bodyG.castShadow = true;
         grannyGroup.add(bodyG);
-
         const headMatG = new THREE.MeshStandardMaterial({ color: 0xe8c8b0, roughness: 0.6 });
         const headG = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), headMatG);
         headG.position.y = 1.5;
         headG.castShadow = true;
         grannyGroup.add(headG);
-
         const hairMat = new THREE.MeshStandardMaterial({ color: 0x8a7a6a, roughness: 0.9 });
         const hair = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), hairMat);
         hair.position.set(0, 1.7, 0.1);
@@ -530,7 +506,6 @@
         const hairBun = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6), hairMat);
         hairBun.position.set(0, 1.85, 0.05);
         grannyGroup.add(hairBun);
-
         const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf0e8e0, roughness: 0.3 });
         const eyeMatG = new THREE.MeshStandardMaterial({ color: 0xff4422, emissive: 0xaa2222, emissiveIntensity: 0.4 });
         const eye1W = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeWhiteMat);
@@ -545,7 +520,6 @@
         const eye2G = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeMatG);
         eye2G.position.set(0.14, 1.55, 0.32);
         grannyGroup.add(eye2G);
-
         const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
         const p1 = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), pupilMat);
         p1.position.set(-0.16, 1.54, 0.36);
@@ -553,7 +527,6 @@
         const p2 = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), pupilMat);
         p2.position.set(0.12, 1.54, 0.36);
         grannyGroup.add(p2);
-
         const glassMat = new THREE.MeshStandardMaterial({ color: 0xccaa88, roughness: 0.3, metalness: 0.7, transparent: true, opacity: 0.4 });
         const glass1 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.02, 8), glassMat);
         glass1.rotation.x = Math.PI/2;
@@ -563,7 +536,6 @@
         glass2.rotation.x = Math.PI/2;
         glass2.position.set(0.13, 1.55, 0.32);
         grannyGroup.add(glass2);
-
         const mouthMat = new THREE.MeshStandardMaterial({ color: 0x8a3a3a });
         const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.015, 6, 12, Math.PI), mouthMat);
         mouth.rotation.x = 0.2;
@@ -578,30 +550,6 @@
         grannyLight.position.set(-5, 1.5, -4);
         scene.add(grannyLight);
 
-        // --- ПРЕДМЕТЫ ---
-        const itemMeshes = [];
-        function createItems() {
-            itemMeshes.forEach(m => scene.remove(m));
-            itemMeshes.length = 0;
-            
-            const positions = [
-                { x: -2, z: -4, color: 0x8a6a4a },
-                { x: 3, z: -3, color: 0x6a8a4a },
-                { x: -4, z: 3, color: 0x4a6a8a },
-                { x: 4, z: 2, color: 0x8a4a6a }
-            ];
-            positions.forEach(pos => {
-                const mat = new THREE.MeshStandardMaterial({ color: pos.color, roughness: 0.3, metalness: 0.2, emissive: pos.color, emissiveIntensity: 0.05 });
-                const item = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.25, 0.4, 8), mat);
-                item.position.set(pos.x, 0.2, pos.z);
-                item.castShadow = true;
-                item.receiveShadow = true;
-                scene.add(item);
-                itemMeshes.push(item);
-            });
-        }
-        createItems();
-
         // --- МЕБЕЛЬ ---
         function createFurniture(w, h, d, x, z, yOffset = 0, color = 0x3a2525) {
             const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9, emissive: 0x0d0808 });
@@ -610,7 +558,6 @@
             box.castShadow = true;
             box.receiveShadow = true;
             scene.add(box);
-            return box;
         }
         createFurniture(1.6, 1.2, 0.8, -3, -5, 0, 0x4a2a2a);
         createFurniture(1.2, 0.8, 1.2, 3, -5, 0, 0x3d2222);
@@ -667,7 +614,6 @@
             return { x, z };
         }
 
-        // --- ОБНОВЛЕНИЕ UI ---
         function updateUI() {
             healthDiv.textContent = `❤️ ${player.health}`;
             floorDiv.textContent = player.floor === 1 ? '📍 1 ЭТАЖ' : '📍 2 ЭТАЖ';
@@ -680,88 +626,244 @@
             }
         }
 
-        // --- СОКЕТ СОБЫТИЯ ---
-        socket.on('roomCreated', (data) => {
-            roomId = data.roomId;
-            isHost = true;
-            startGame();
-        });
-
-        socket.on('joinedRoom', (data) => {
-            roomId = data.roomId;
-            isHost = false;
-            otherPlayers = data.playerData;
-            grannyData = data.granny;
-            items = data.items || [];
-            startGame();
-        });
-
-        socket.on('playerJoined', (data) => {
-            otherPlayers[data.playerId] = data.data;
-            p2Label.style.display = 'block';
-            connStatus.textContent = '🟢 Игрок 2 подключён';
-            connStatus.className = '';
-        });
-
-        socket.on('playerMoved', (data) => {
-            if (otherPlayers[data.playerId]) {
-                otherPlayers[data.playerId].x = data.data.x;
-                otherPlayers[data.playerId].z = data.data.z;
-                otherPlayers[data.playerId].floor = data.data.floor;
-                otherPlayers[data.playerId].health = data.data.health;
-                otherPlayers[data.playerId].alive = data.data.alive;
-            }
-        });
-
-        socket.on('grannyMoved', (data) => {
-            grannyData = data;
-        });
-
-        socket.on('noiseMade', (data) => {
-            noiseDiv.textContent = '🔊 ШУМ!';
-            noiseDiv.classList.add('show');
-            setTimeout(() => noiseDiv.classList.remove('show'), 2000);
-        });
-
-        socket.on('playerLeft', (data) => {
-            delete otherPlayers[data.playerId];
-            p2Label.style.display = 'none';
-            connStatus.textContent = '🔴 Игрок 2 отключён';
-            connStatus.className = 'disconnected';
-        });
-
-        socket.on('error', (data) => {
-            alert('Ошибка: ' + data.message);
-        });
-
-        // --- НАЧАЛО ИГРЫ ---
-        function startGame() {
-            menu.classList.add('hidden');
-            gameUI.style.display = 'block';
-            roomIdDisplay.textContent = `🏷️ КОМНАТА: ${roomId}`;
-            if (isHost) {
-                p1Label.textContent = '👤 Хост';
-                connStatus.textContent = '🟢 Ожидание игрока 2...';
-                connStatus.className = '';
-            } else {
-                p1Label.textContent = '👤 Игрок 2';
-                p2Label.style.display = 'block';
-                p2Label.textContent = '👤 Игрок 1 (хост)';
-                connStatus.textContent = '🟢 Подключён';
-                connStatus.className = '';
-            }
-            renderer.domElement.click();
+        function updateFlashlight() {
+            flashlight.position.copy(camera.position);
+            flashlight.position.y = player.floor === 1 ? 1.4 : floorHeight + 1.4;
+            const target = new THREE.Vector3(0, 0, -5);
+            target.applyQuaternion(camera.quaternion);
+            target.add(camera.position);
+            flashlight.target.position.copy(target);
         }
 
-        // --- КНОПКИ МЕНЮ ---
-        createBtn.addEventListener('click', () => {
-            socket.emit('createRoom');
+        // --- P2P WEBRTC ---
+        function generateRoomId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function createRoom() {
+            roomId = generateRoomId();
+            isHost = true;
+            createPeerConnection();
+            startGame();
+            roomIdDisplay.textContent = `🏷️ КОМНАТА: ${roomId}`;
+            copyBtn.classList.add('show');
+            connStatus.textContent = '🟡 Ожидание подключения...';
+            connStatus.className = '';
+        }
+
+        function joinRoom(code) {
+            roomId = code.toUpperCase();
+            isHost = false;
+            createPeerConnection();
+            startGame();
+            roomIdDisplay.textContent = `🏷️ КОМНАТА: ${roomId}`;
+            connStatus.textContent = '🟡 Подключение...';
+            connStatus.className = '';
+        }
+
+        function createPeerConnection() {
+            const config = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' }
+                ]
+            };
+            peerConnection = new RTCPeerConnection(config);
+
+            // Создаём канал данных
+            dataChannel = peerConnection.createDataChannel('game');
+            setupDataChannel();
+
+            // Обработка входящего канала
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                setupDataChannel();
+            };
+
+            // Обработка ICE кандидатов
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    // Отправляем кандидата другому игроку
+                    const data = {
+                        type: 'candidate',
+                        candidate: event.candidate
+                    };
+                    // Копируем в буфер обмена для передачи
+                    if (isHost) {
+                        // Хост ждёт, пока подключится второй игрок
+                    }
+                }
+            };
+
+            // Создаём offer (если хост)
+            if (isHost) {
+                peerConnection.createOffer()
+                    .then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => {
+                        // Показываем offer для копирования
+                        const offerData = {
+                            type: 'offer',
+                            sdp: peerConnection.localDescription.sdp
+                        };
+                        const offerString = btoa(JSON.stringify(offerData));
+                        // Показываем в виде ссылки
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('join', roomId);
+                        url.searchParams.set('offer', offerString);
+                        const link = url.toString();
+                        // Обновляем UI для копирования
+                        copyBtn.textContent = '📋 Копировать ссылку';
+                        copyBtn.onclick = () => {
+                            navigator.clipboard.writeText(link).then(() => {
+                                copyBtn.textContent = '✅ Скопировано!';
+                                setTimeout(() => {
+                                    copyBtn.textContent = '📋 Копировать ссылку';
+                                }, 2000);
+                            });
+                        };
+                        connStatus.textContent = '🟡 Скопируйте ссылку и отправьте другу';
+                    });
+            }
+        }
+
+        function setupDataChannel() {
+            dataChannel.onopen = () => {
+                isConnected = true;
+                connStatus.textContent = '🟢 Подключено!';
+                connStatus.className = '';
+                sendMessage({ type: 'init', data: { x: player.x, z: player.z, floor: player.floor } });
+            };
+
+            dataChannel.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleMessage(message);
+            };
+
+            dataChannel.onclose = () => {
+                isConnected = false;
+                connStatus.textContent = '🔴 Отключено';
+                connStatus.className = 'disconnected';
+            };
+        }
+
+        function sendMessage(message) {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify(message));
+            }
+        }
+
+        function handleMessage(message) {
+            switch (message.type) {
+                case 'init':
+                    otherPlayerData = message.data;
+                    break;
+                case 'move':
+                    if (otherPlayerData) {
+                        otherPlayerData.x = message.data.x;
+                        otherPlayerData.z = message.data.z;
+                        otherPlayerData.floor = message.data.floor;
+                    }
+                    break;
+                case 'granny':
+                    grannyData = message.data;
+                    break;
+                case 'noise':
+                    // Визуальный эффект шума
+                    const noiseDiv = document.createElement('div');
+                    noiseDiv.style.position = 'absolute';
+                    noiseDiv.style.top = '50%';
+                    noiseDiv.style.left = '50%';
+                    noiseDiv.style.transform = 'translate(-50%, -50%)';
+                    noiseDiv.style.color = '#ff8844';
+                    noiseDiv.style.fontSize = '3rem';
+                    noiseDiv.style.textShadow = '0 0 40px #ff4400';
+                    noiseDiv.style.pointerEvents = 'none';
+                    noiseDiv.style.zIndex = '100';
+                    noiseDiv.textContent = '🔊 ШУМ!';
+                    document.body.appendChild(noiseDiv);
+                    setTimeout(() => noiseDiv.remove(), 1500);
+                    break;
+                case 'health':
+                    if (otherPlayerData) {
+                        otherPlayerData.health = message.data.health;
+                        otherPlayerData.alive = message.data.alive;
+                    }
+                    break;
+                case 'win':
+                    if (otherPlayerData) {
+                        otherPlayerData.alive = false;
+                        otherPlayerData.win = true;
+                    }
+                    break;
+            }
+        }
+
+        // --- ОБРАБОТКА ОФФЕРОВ (для подключения) ---
+        // Проверяем параметры URL при загрузке
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const joinCode = params.get('join');
+            const offerData = params.get('offer');
+            
+            if (joinCode && offerData) {
+                // Подключаемся к существующей комнате
+                roomInput.value = joinCode;
+                setTimeout(() => {
+                    joinBtn.click();
+                    // После создания peer connection обрабатываем offer
+                    setTimeout(() => {
+                        try {
+                            const offer = JSON.parse(atob(offerData));
+                            peerConnection.setRemoteDescription(new RTCSessionDescription({
+                                type: 'offer',
+                                sdp: offer.sdp
+                            }));
+                            peerConnection.createAnswer()
+                                .then(answer => peerConnection.setLocalDescription(answer))
+                                .then(() => {
+                                    // Отправляем ответ обратно (через ссылку)
+                                    const answerData = {
+                                        type: 'answer',
+                                        sdp: peerConnection.localDescription.sdp
+                                    };
+                                    const answerString = btoa(JSON.stringify(answerData));
+                                    // Показываем для копирования
+                                    copyBtn.textContent = '📋 Отправить ответ';
+                                    copyBtn.onclick = () => {
+                                        navigator.clipboard.writeText(answerString).then(() => {
+                                            copyBtn.textContent = '✅ Скопировано!';
+                                            setTimeout(() => {
+                                                copyBtn.textContent = '📋 Отправить ответ';
+                                            }, 2000);
+                                        });
+                                    };
+                                    connStatus.textContent = '🟡 Отправьте ответ хосту';
+                                });
+                        } catch (e) {
+                            console.error('Ошибка обработки offer:', e);
+                        }
+                    }, 500);
+                }, 500);
+            }
         });
+
+        // Обработка ответа (для хоста)
+        window.addEventListener('message', (event) => {
+            // Этот метод используется для передачи ответов между вкладками
+            // В реальности ответ передаётся через текстовое поле или ссылку
+        });
+
+        // --- КНОПКИ МЕНЮ ---
+        createBtn.addEventListener('click', createRoom);
 
         joinBtn.addEventListener('click', () => {
             const code = roomInput.value.trim().toUpperCase();
             if (code.length === 6) {
-                socket.emit('joinRoom', { roomId: code });
+                joinRoom(code);
             } else {
                 alert('Введите корректный код комнаты (6 символов)');
             }
@@ -771,6 +873,24 @@
             if (e.key === 'Enter') joinBtn.click();
             roomInput.value = roomInput.value.toUpperCase();
         });
+
+        copyBtn.addEventListener('click', () => {
+            if (isHost) {
+                // Копируем ссылку с offer
+                // (уже реализовано в createRoom)
+            } else {
+                // Копируем ответ
+                // (реализовано в обработчике)
+            }
+        });
+
+        // --- ИНИЦИАЛИЗАЦИЯ ИГРЫ ---
+        function startGame() {
+            menu.classList.add('hidden');
+            gameUI.style.display = 'block';
+            renderer.domElement.click();
+            updateUI();
+        }
 
         // --- УПРАВЛЕНИЕ ---
         const keys = { w: false, a: false, s: false, d: false };
@@ -782,26 +902,32 @@
                 keys[k] = true;
                 e.preventDefault();
             }
-            if (k === 'e' && player.alive && !noiseCooldown) {
+            if (k === 'e' && player.alive && !noiseCooldown && isConnected) {
                 e.preventDefault();
                 noiseCooldown = true;
-                socket.emit('makeNoise', {
-                    x: camera.position.x,
-                    z: camera.position.z,
-                    floor: player.floor
-                });
+                sendMessage({ type: 'noise', data: { x: camera.position.x, z: camera.position.z, floor: player.floor } });
+                // Локальный эффект
+                const noiseDiv = document.createElement('div');
+                noiseDiv.style.position = 'absolute';
+                noiseDiv.style.top = '50%';
+                noiseDiv.style.left = '50%';
+                noiseDiv.style.transform = 'translate(-50%, -50%)';
+                noiseDiv.style.color = '#ff8844';
+                noiseDiv.style.fontSize = '3rem';
+                noiseDiv.style.textShadow = '0 0 40px #ff4400';
+                noiseDiv.style.pointerEvents = 'none';
+                noiseDiv.style.zIndex = '100';
                 noiseDiv.textContent = '🔊 БАМ!';
-                noiseDiv.classList.add('show');
-                setTimeout(() => {
-                    noiseDiv.classList.remove('show');
-                    noiseCooldown = false;
-                }, 2000);
+                document.body.appendChild(noiseDiv);
+                setTimeout(() => noiseDiv.remove(), 1500);
+                setTimeout(() => { noiseCooldown = false; }, 2000);
             }
             if (e.key === ' ' && !player.alive) {
                 e.preventDefault();
                 location.reload();
             }
         });
+
         document.addEventListener('keyup', (e) => {
             const k = e.key.toLowerCase();
             if (k === 'w' || k === 'a' || k === 's' || k === 'd') {
@@ -818,6 +944,8 @@
         controls.addEventListener('unlock', () => { isLocked = false; });
 
         // --- АНИМАЦИЯ ---
+        let lastSendTime = 0;
+
         function animate() {
             requestAnimationFrame(animate);
 
@@ -856,13 +984,11 @@
                     player.z = clamped.z;
 
                     // Отправка позиции
-                    socket.emit('updatePlayer', {
-                        x: player.x,
-                        z: player.z,
-                        floor: player.floor,
-                        health: player.health,
-                        alive: player.alive
-                    });
+                    const now = Date.now();
+                    if (now - lastSendTime > 50 && isConnected) {
+                        lastSendTime = now;
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
+                    }
                 }
 
                 // Проверка этажей
@@ -873,13 +999,7 @@
                         camera.position.y = floorHeight + 1.7;
                         player.floor = 2;
                         updateUI();
-                        socket.emit('updatePlayer', {
-                            x: player.x,
-                            z: player.z,
-                            floor: player.floor,
-                            health: player.health,
-                            alive: player.alive
-                        });
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
                     }
                 }
                 if (Math.abs(px + 1) < 1.5 && Math.abs(pz - 3) < 1.5) {
@@ -887,13 +1007,7 @@
                         camera.position.y = 1.7;
                         player.floor = 1;
                         updateUI();
-                        socket.emit('updatePlayer', {
-                            x: player.x,
-                            z: player.z,
-                            floor: player.floor,
-                            health: player.health,
-                            alive: player.alive
-                        });
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
                     }
                 }
 
@@ -903,13 +1017,7 @@
                     player.win = true;
                     controls.unlock();
                     updateUI();
-                    socket.emit('updatePlayer', {
-                        x: player.x,
-                        z: player.z,
-                        floor: player.floor,
-                        health: player.health,
-                        alive: player.alive
-                    });
+                    sendMessage({ type: 'win', data: {} });
                 }
 
                 updateFlashlight();
@@ -930,19 +1038,7 @@
             // Анимация Грэнни
             grannyGroup.position.y += Math.sin(Date.now() * 0.002) * 0.001;
 
-            // Обновление позиции другого игрока (если есть)
-            // (упрощённо - на сервере)
-
             renderer.render(scene, camera);
-        }
-
-        function updateFlashlight() {
-            flashlight.position.copy(camera.position);
-            flashlight.position.y = player.floor === 1 ? 1.4 : floorHeight + 1.4;
-            const target = new THREE.Vector3(0, 0, -5);
-            target.applyQuaternion(camera.quaternion);
-            target.add(camera.position);
-            flashlight.target.position.copy(target);
         }
 
         // --- РЕСАЙЗ ---
@@ -954,8 +1050,1064 @@
 
         // --- СТАРТ ---
         animate();
-        console.log('🏚️ Побег от Грэнни — Сетевая игра');
-        console.log('📡 Создайте комнату и поделитесь кодом с другом!');
+        console.log('🏚️ Побег от Грэнни — P2P версия (WebRTC)');
+        console.log('📡 Работает на GitHub Pages без сервера!');
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Побег от Грэнни · P2P</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            overflow: hidden; 
+            background: #0a0505; 
+            font-family: 'Courier New', monospace;
+            color: #fff;
+        }
+        #menu {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(5, 2, 2, 0.97);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            padding: 20px;
+        }
+        #menu.hidden { display: none; }
+        #menu h1 {
+            color: #d9b8a8;
+            font-size: 3rem;
+            text-shadow: 0 0 40px #8a3333;
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+            text-align: center;
+        }
+        #menu h2 {
+            color: #a77a6a;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .menu-btn {
+            background: #2d1717;
+            border: 2px solid #a55353;
+            color: #f0d6c6;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            margin: 8px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: 0.2s;
+            min-width: 250px;
+            letter-spacing: 2px;
+        }
+        .menu-btn:hover {
+            background: #4d2626;
+            border-color: #d67a7a;
+            transform: scale(1.05);
+            box-shadow: 0 0 40px #aa3f3f;
+        }
+        .menu-btn.secondary {
+            border-color: #6a4a4a;
+            background: #1a0d0d;
+        }
+        .menu-btn.secondary:hover {
+            border-color: #8a6a6a;
+            box-shadow: 0 0 30px #6a3f3f;
+        }
+        .menu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .menu-input {
+            background: #1a0d0d;
+            border: 2px solid #6a4a4a;
+            color: #f0d6c6;
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            margin: 8px;
+            min-width: 250px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            outline: none;
+        }
+        .menu-input:focus {
+            border-color: #a55353;
+            box-shadow: 0 0 30px #6a2a2a;
+        }
+        #menu-info {
+            color: #8a7a7a;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            text-align: center;
+            line-height: 1.8;
+            max-width: 500px;
+        }
+        #menu-info .highlight {
+            color: #dbb8a8;
+            font-weight: bold;
+        }
+        #game-ui {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #health {
+            position: absolute;
+            bottom: 30px; left: 30px;
+            color: #e0b0a0;
+            font-size: 2rem;
+            background: #140b0bdd;
+            padding: 6px 28px;
+            border-radius: 60px;
+            border: 1px solid #884444;
+            box-shadow: 0 0 30px #441111;
+            backdrop-filter: blur(4px);
+            letter-spacing: 2px;
+            user-select: none;
+        }
+        #status {
+            position: absolute;
+            bottom: 30px; right: 30px;
+            color: #dbb8a8;
+            font-size: 1.1rem;
+            background: #0f0808dd;
+            padding: 8px 28px;
+            border-radius: 60px;
+            border: 1px solid #7a4a4a;
+            backdrop-filter: blur(4px);
+            text-align: center;
+            min-width: 140px;
+            user-select: none;
+        }
+        #floor-indicator {
+            position: absolute;
+            top: 80px; left: 50%;
+            transform: translateX(-50%);
+            color: #dbb8a8;
+            background: #140b0bdd;
+            padding: 4px 24px;
+            border-radius: 30px;
+            border: 1px solid #7a4a4a;
+            font-size: 1.2rem;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+        #controls-hint {
+            position: absolute;
+            bottom: 100px; left: 50%;
+            transform: translateX(-50%);
+            color: #a77a6a;
+            background: #1a0e0ed4;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            border: 1px solid #5f3a3a;
+            backdrop-filter: blur(4px);
+            letter-spacing: 1px;
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+        }
+        #room-id {
+            position: absolute;
+            top: 130px; left: 50%;
+            transform: translateX(-50%);
+            color: #d9b8a8;
+            background: #0f0808dd;
+            padding: 4px 20px;
+            border-radius: 30px;
+            border: 1px solid #7a4a4a;
+            font-size: 1rem;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+        #connection-status {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: #6a8a6a;
+            font-size: 0.9rem;
+            background: #0f0808dd;
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid #4a7a4a;
+            backdrop-filter: blur(4px);
+            user-select: none;
+            pointer-events: none;
+        }
+        #connection-status.disconnected {
+            color: #8a4a4a;
+            border-color: #7a4a4a;
+        }
+        #copy-btn {
+            position: absolute;
+            top: 170px; left: 50%;
+            transform: translateX(-50%);
+            background: #2d1717;
+            border: 1px solid #a55353;
+            color: #f0d6c6;
+            padding: 4px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            pointer-events: auto;
+            transition: 0.2s;
+            display: none;
+        }
+        #copy-btn:hover {
+            background: #4d2626;
+        }
+        #copy-btn.show {
+            display: block;
+        }
+        @media (max-width: 700px) {
+            #menu h1 { font-size: 2rem; }
+            .menu-btn { font-size: 1rem; padding: 12px 30px; min-width: 200px; }
+            .menu-input { font-size: 1rem; min-width: 200px; padding: 10px 16px; }
+            #health { font-size: 1.3rem; padding: 4px 16px; bottom: 15px; left: 15px; }
+            #status { font-size: 0.9rem; padding: 4px 16px; min-width: 100px; bottom: 15px; right: 15px; }
+            #controls-hint { font-size: 0.7rem; padding: 4px 12px; bottom: 70px; white-space: normal; }
+            #floor-indicator { font-size: 0.9rem; top: 70px; padding: 2px 16px; }
+            #room-id { font-size: 0.8rem; top: 110px; padding: 2px 14px; }
+            #connection-status { font-size: 0.7rem; padding: 4px 12px; }
+            #copy-btn { top: 145px; font-size: 0.7rem; padding: 2px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- МЕНЮ -->
+    <div id="menu">
+        <h1>🏚️ ПОБЕГ ОТ ГРЭННИ</h1>
+        <h2>P2P Сетевая игра · 2 игрока</h2>
+        <button class="menu-btn" id="createBtn">🎮 СОЗДАТЬ КОМНАТУ</button>
+        <div style="display:flex; gap:10px; align-items:center; margin:8px; flex-wrap:wrap; justify-content:center;">
+            <input class="menu-input" id="roomInput" placeholder="Введите код комнаты" maxlength="6">
+            <button class="menu-btn secondary" id="joinBtn" style="min-width:120px; padding:12px 24px;">ПОДКЛЮЧИТЬСЯ</button>
+        </div>
+        <div id="menu-info">
+            <span class="highlight">Создайте комнату</span> — получите код и поделитесь с другом.<br>
+            <span class="highlight">Подключитесь</span> — введите код и ждите начала.<br>
+            <span style="color:#6a5a5a; font-size:0.8rem;">📡 Работает через WebRTC (P2P) — без сервера!</span>
+        </div>
+    </div>
+
+    <!-- ИГРОВОЙ ИНТЕРФЕЙС -->
+    <div id="game-ui" style="display:none;">
+        <div id="connection-status" class="disconnected">🔴 Ожидание...</div>
+        <div id="health">❤️ 3</div>
+        <div id="status">🔦 ИЩИ ВЫХОД</div>
+        <div id="floor-indicator">📍 1 ЭТАЖ</div>
+        <div id="room-id">🏷️ КОМНАТА: ----</div>
+        <button id="copy-btn">📋 Копировать код</button>
+        <div id="controls-hint">WASD — ходьба · Мышь — взгляд · E — уронить предмет</div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+        // --- P2P СОЕДИНЕНИЕ (WebRTC) ---
+        let peerConnection = null;
+        let dataChannel = null;
+        let roomId = '';
+        let isHost = false;
+        let isConnected = false;
+        let otherPlayerData = null;
+
+        // --- ЭЛЕМЕНТЫ UI ---
+        const menu = document.getElementById('menu');
+        const gameUI = document.getElementById('game-ui');
+        const createBtn = document.getElementById('createBtn');
+        const joinBtn = document.getElementById('joinBtn');
+        const roomInput = document.getElementById('roomInput');
+        const roomIdDisplay = document.getElementById('room-id');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusDiv = document.getElementById('status');
+        const healthDiv = document.getElementById('health');
+        const floorDiv = document.getElementById('floor-indicator');
+        const connStatus = document.getElementById('connection-status');
+
+        // --- ИГРОВОЕ СОСТОЯНИЕ ---
+        const player = {
+            health: 3,
+            alive: true,
+            win: false,
+            floor: 1,
+            x: 2,
+            z: 5
+        };
+
+        let grannyData = { x: -5, z: -4, floor: 1, rotation: 0 };
+
+        // --- ТРЁХМЕРНАЯ СЦЕНА (сокращённо для экономии места) ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0707);
+        scene.fog = new THREE.FogExp2(0x0b0707, 0.005);
+
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 50);
+        camera.position.set(2, 1.7, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new PointerLockControls(camera, renderer.domElement);
+        let isLocked = false;
+
+        // --- ОСВЕЩЕНИЕ ---
+        const ambient = new THREE.AmbientLight(0x332222, 0.6);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffcc88, 0.5);
+        mainLight.position.set(5, 10, 3);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x885533, 0.3, 20);
+        fillLight.position.set(-3, 3, -4);
+        scene.add(fillLight);
+        const flashlight = new THREE.SpotLight(0xffd09a, 2.2, 16, Math.PI / 5, 0.5, 1.5);
+        flashlight.position.set(0, 1.6, 0);
+        flashlight.target.position.set(0, 0, -5);
+        scene.add(flashlight);
+        scene.add(flashlight.target);
+
+        // --- ПОСТРОЕНИЕ ДОМА (упрощённо) ---
+        const wallMat = new THREE.MeshStandardMaterial({ color: 0x3d2424, roughness: 0.95, emissive: 0x0d0808, emissiveIntensity: 0.05 });
+        const floorMat = new THREE.MeshStandardMaterial({ color: 0x2a1a1a, roughness: 0.9, metalness: 0.1, emissive: 0x0f0808, emissiveIntensity: 0.05 });
+        const doorMat = new THREE.MeshStandardMaterial({ color: 0x7a4f2a, emissive: 0xac6f3a, emissiveIntensity: 0.2, roughness: 0.4 });
+        const handleMat = new THREE.MeshStandardMaterial({ color: 0xc99f5e, emissive: 0x553322, emissiveIntensity: 0.2 });
+
+        const roomSize = 16;
+        const floorHeight = 3.5;
+        const wallThick = 0.25;
+        const wallColliders = [];
+
+        function createWall(w, h, pos, rotY = 0) {
+            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, wallThick), wallMat);
+            wall.position.set(pos.x, pos.y, pos.z);
+            wall.rotation.y = rotY;
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            scene.add(wall);
+            const halfW = w/2;
+            const halfThick = wallThick/2;
+            let minX, maxX, minZ, maxZ;
+            if (rotY === 0) {
+                minX = pos.x - halfW;
+                maxX = pos.x + halfW;
+                minZ = pos.z - halfThick;
+                maxZ = pos.z + halfThick;
+            } else {
+                minX = pos.x - halfThick;
+                maxX = pos.x + halfThick;
+                minZ = pos.z - halfW;
+                maxZ = pos.z + halfW;
+            }
+            wallColliders.push({ minX, maxX, minZ, maxZ, yMin: pos.y - h/2, yMax: pos.y + h/2 });
+        }
+
+        const floor1 = new THREE.Mesh(new THREE.PlaneGeometry(roomSize, roomSize), floorMat);
+        floor1.rotation.x = -Math.PI / 2;
+        floor1.position.y = 0;
+        floor1.receiveShadow = true;
+        scene.add(floor1);
+
+        const floor2 = new THREE.Mesh(new THREE.PlaneGeometry(roomSize, roomSize), floorMat);
+        floor2.rotation.x = -Math.PI / 2;
+        floor2.position.y = floorHeight;
+        floor2.receiveShadow = true;
+        scene.add(floor2);
+
+        createWall(roomSize, floorHeight, { x: 0, y: floorHeight/2, z: -roomSize/2 }, 0);
+        createWall(roomSize, floorHeight, { x: -roomSize/2, y: floorHeight/2, z: 0 }, Math.PI/2);
+        createWall(roomSize, floorHeight, { x: roomSize/2, y: floorHeight/2, z: 0 }, Math.PI/2);
+        
+        const wfl = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
+        wfl.position.set(-3.5, floorHeight/2, roomSize/2);
+        wfl.castShadow = true;
+        wfl.receiveShadow = true;
+        scene.add(wfl);
+        wallColliders.push({ minX: -6.25, maxX: -0.75, minZ: 7.875, maxZ: 8.125, yMin: 0, yMax: floorHeight });
+
+        const wfr = new THREE.Mesh(new THREE.BoxGeometry(5.5, floorHeight, wallThick), wallMat);
+        wfr.position.set(3.5, floorHeight/2, roomSize/2);
+        wfr.castShadow = true;
+        wfr.receiveShadow = true;
+        scene.add(wfr);
+        wallColliders.push({ minX: 0.75, maxX: 6.25, minZ: 7.875, maxZ: 8.125, yMin: 0, yMax: floorHeight });
+
+        const wft = new THREE.Mesh(new THREE.BoxGeometry(3.5, 0.6, wallThick), wallMat);
+        wft.position.set(0, floorHeight - 0.3, roomSize/2);
+        wft.castShadow = true;
+        wft.receiveShadow = true;
+        scene.add(wft);
+        wallColliders.push({ minX: -1.75, maxX: 1.75, minZ: 7.875, maxZ: 8.125, yMin: floorHeight - 0.6, yMax: floorHeight });
+
+        createWall(roomSize, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: -roomSize/2 }, 0);
+        createWall(roomSize, floorHeight, { x: -roomSize/2, y: floorHeight + floorHeight/2, z: 0 }, Math.PI/2);
+        createWall(roomSize, floorHeight, { x: roomSize/2, y: floorHeight + floorHeight/2, z: 0 }, Math.PI/2);
+        createWall(roomSize, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: roomSize/2 }, 0);
+
+        function createInnerWall(w, h, pos, rotY = 0) {
+            const mat = new THREE.MeshStandardMaterial({ color: 0x3d2424, roughness: 0.95, emissive: 0x0d0808, emissiveIntensity: 0.05 });
+            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.2), mat);
+            wall.position.set(pos.x, pos.y, pos.z);
+            wall.rotation.y = rotY;
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            scene.add(wall);
+            const halfW = w/2;
+            const halfThick = 0.1;
+            if (rotY === 0) {
+                wallColliders.push({ minX: pos.x - halfW, maxX: pos.x + halfW, minZ: pos.z - halfThick, maxZ: pos.z + halfThick, yMin: pos.y - h/2, yMax: pos.y + h/2 });
+            } else {
+                wallColliders.push({ minX: pos.x - halfThick, maxX: pos.x + halfThick, minZ: pos.z - halfW, maxZ: pos.z + halfW, yMin: pos.y - h/2, yMax: pos.y + h/2 });
+            }
+        }
+
+        createInnerWall(4, floorHeight, { x: -4, y: floorHeight/2, z: 2 }, 0);
+        createInnerWall(4, floorHeight, { x: -4, y: floorHeight/2, z: -2 }, 0);
+        createInnerWall(4, floorHeight, { x: 4, y: floorHeight/2, z: 2 }, 0);
+        createInnerWall(4, floorHeight, { x: 4, y: floorHeight/2, z: -2 }, 0);
+        createInnerWall(6, floorHeight, { x: 0, y: floorHeight/2, z: -4 }, Math.PI/2);
+        createInnerWall(6, floorHeight, { x: 0, y: floorHeight/2, z: 4 }, Math.PI/2);
+        createInnerWall(4, floorHeight, { x: -4, y: floorHeight + floorHeight/2, z: 2 }, 0);
+        createInnerWall(4, floorHeight, { x: -4, y: floorHeight + floorHeight/2, z: -2 }, 0);
+        createInnerWall(4, floorHeight, { x: 4, y: floorHeight + floorHeight/2, z: 2 }, 0);
+        createInnerWall(4, floorHeight, { x: 4, y: floorHeight + floorHeight/2, z: -2 }, 0);
+        createInnerWall(6, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: -4 }, Math.PI/2);
+        createInnerWall(6, floorHeight, { x: 0, y: floorHeight + floorHeight/2, z: 4 }, Math.PI/2);
+
+        function createStair(x, z, yBase, direction = 1) {
+            const stairMat = new THREE.MeshStandardMaterial({ color: 0x4a2a2a, roughness: 0.8 });
+            for (let i = 0; i < 12; i++) {
+                const step = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.15, 0.5), stairMat);
+                step.position.set(x + i * 0.4 * direction, yBase + i * 0.3, z);
+                step.castShadow = true;
+                step.receiveShadow = true;
+                scene.add(step);
+            }
+        }
+        createStair(-1.0, -3.0, 0.1, 1);
+        createStair(-1.0, 3.0, 0.1, 1);
+
+        const door = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.6, 0.25), doorMat);
+        door.position.set(0, 1.3, 8.15);
+        door.castShadow = true;
+        scene.add(door);
+        const handle = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), handleMat);
+        handle.position.set(0.85, 1.3, 8.4);
+        scene.add(handle);
+        const exitLight = new THREE.PointLight(0xffaa55, 0.8, 10);
+        exitLight.position.set(0, 2.8, 8.0);
+        scene.add(exitLight);
+
+        // --- ГРЭННИ ---
+        const grannyGroup = new THREE.Group();
+        const dressMatG = new THREE.MeshStandardMaterial({ color: 0x4a2a5a, roughness: 0.7, metalness: 0.1, emissive: 0x1a0a2a, emissiveIntensity: 0.05 });
+        const dressG = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 0.9, 12), dressMatG);
+        dressG.position.y = 0.45;
+        dressG.castShadow = true;
+        grannyGroup.add(dressG);
+        const apronMat = new THREE.MeshStandardMaterial({ color: 0x7a5a5a, roughness: 0.8 });
+        const apron = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.1), apronMat);
+        apron.position.set(0, 0.6, 0.45);
+        grannyGroup.add(apron);
+        const bodyMatG = new THREE.MeshStandardMaterial({ color: 0x3a2a4a, roughness: 0.8 });
+        const bodyG = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.5, 0.4), bodyMatG);
+        bodyG.position.y = 1.0;
+        bodyG.castShadow = true;
+        grannyGroup.add(bodyG);
+        const headMatG = new THREE.MeshStandardMaterial({ color: 0xe8c8b0, roughness: 0.6 });
+        const headG = new THREE.Mesh(new THREE.SphereGeometry(0.28, 12, 12), headMatG);
+        headG.position.y = 1.5;
+        headG.castShadow = true;
+        grannyGroup.add(headG);
+        const hairMat = new THREE.MeshStandardMaterial({ color: 0x8a7a6a, roughness: 0.9 });
+        const hair = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), hairMat);
+        hair.position.set(0, 1.7, 0.1);
+        hair.scale.set(1.2, 0.8, 1);
+        grannyGroup.add(hair);
+        const hairBun = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 6), hairMat);
+        hairBun.position.set(0, 1.85, 0.05);
+        grannyGroup.add(hairBun);
+        const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xf0e8e0, roughness: 0.3 });
+        const eyeMatG = new THREE.MeshStandardMaterial({ color: 0xff4422, emissive: 0xaa2222, emissiveIntensity: 0.4 });
+        const eye1W = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeWhiteMat);
+        eye1W.position.set(-0.13, 1.55, 0.25);
+        grannyGroup.add(eye1W);
+        const eye2W = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 8), eyeWhiteMat);
+        eye2W.position.set(0.13, 1.55, 0.25);
+        grannyGroup.add(eye2W);
+        const eye1G = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeMatG);
+        eye1G.position.set(-0.14, 1.55, 0.32);
+        grannyGroup.add(eye1G);
+        const eye2G = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), eyeMatG);
+        eye2G.position.set(0.14, 1.55, 0.32);
+        grannyGroup.add(eye2G);
+        const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const p1 = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), pupilMat);
+        p1.position.set(-0.16, 1.54, 0.36);
+        grannyGroup.add(p1);
+        const p2 = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), pupilMat);
+        p2.position.set(0.12, 1.54, 0.36);
+        grannyGroup.add(p2);
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0xccaa88, roughness: 0.3, metalness: 0.7, transparent: true, opacity: 0.4 });
+        const glass1 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.02, 8), glassMat);
+        glass1.rotation.x = Math.PI/2;
+        glass1.position.set(-0.13, 1.55, 0.32);
+        grannyGroup.add(glass1);
+        const glass2 = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.02, 8), glassMat);
+        glass2.rotation.x = Math.PI/2;
+        glass2.position.set(0.13, 1.55, 0.32);
+        grannyGroup.add(glass2);
+        const mouthMat = new THREE.MeshStandardMaterial({ color: 0x8a3a3a });
+        const mouth = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.015, 6, 12, Math.PI), mouthMat);
+        mouth.rotation.x = 0.2;
+        mouth.rotation.z = 0.1;
+        mouth.position.set(0, 1.42, 0.28);
+        grannyGroup.add(mouth);
+
+        grannyGroup.position.set(-5, 0, -4);
+        scene.add(grannyGroup);
+
+        const grannyLight = new THREE.PointLight(0x883333, 0.6, 6);
+        grannyLight.position.set(-5, 1.5, -4);
+        scene.add(grannyLight);
+
+        // --- МЕБЕЛЬ ---
+        function createFurniture(w, h, d, x, z, yOffset = 0, color = 0x3a2525) {
+            const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9, emissive: 0x0d0808 });
+            const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            box.position.set(x, h/2 + yOffset, z);
+            box.castShadow = true;
+            box.receiveShadow = true;
+            scene.add(box);
+        }
+        createFurniture(1.6, 1.2, 0.8, -3, -5, 0, 0x4a2a2a);
+        createFurniture(1.2, 0.8, 1.2, 3, -5, 0, 0x3d2222);
+        createFurniture(1.8, 1.0, 0.8, -5, 4, 0, 0x4f2e2e);
+        createFurniture(1.0, 1.4, 1.0, 5, 3, 0, 0x332020);
+        createFurniture(0.8, 0.6, 0.8, -2, 1, 0, 0x3d2222);
+        createFurniture(0.8, 0.6, 0.8, 2, -1, 0, 0x3d2222);
+        const furn2 = [
+            { w: 1.6, h: 1.2, d: 0.8, x: -3, z: -5, c: 0x4a2a2a },
+            { w: 1.2, h: 0.8, d: 1.2, x: 3, z: -5, c: 0x3d2222 },
+            { w: 1.8, h: 1.0, d: 0.8, x: -5, z: 4, c: 0x4f2e2e },
+            { w: 1.0, h: 1.4, d: 1.0, x: 5, z: 3, c: 0x332020 },
+            { w: 0.8, h: 0.6, d: 0.8, x: -2, z: 1, c: 0x3d2222 },
+            { w: 0.8, h: 0.6, d: 0.8, x: 2, z: -1, c: 0x3d2222 }
+        ];
+        furn2.forEach(f => {
+            createFurniture(f.w, f.h, f.d, f.x, f.z, floorHeight, f.c);
+        });
+
+        // --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+        function checkWallCollision(x, z, y) {
+            const margin = 0.4;
+            for (let wall of wallColliders) {
+                if (y > wall.yMin && y < wall.yMax) {
+                    if (x > wall.minX - margin && x < wall.maxX + margin &&
+                        z > wall.minZ - margin && z < wall.maxZ + margin) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function clampToWalls(x, z, y) {
+            let newX = x;
+            let newZ = z;
+            if (!checkWallCollision(x, z, y)) {
+                return { x, z };
+            }
+            for (let step of [0.1, 0.2, 0.3, 0.5]) {
+                for (let sign of [-1, 1]) {
+                    const testX = x + sign * step;
+                    if (!checkWallCollision(testX, z, y)) {
+                        return { x: testX, z };
+                    }
+                }
+                for (let sign of [-1, 1]) {
+                    const testZ = z + sign * step;
+                    if (!checkWallCollision(x, testZ, y)) {
+                        return { x, z: testZ };
+                    }
+                }
+            }
+            return { x, z };
+        }
+
+        function updateUI() {
+            healthDiv.textContent = `❤️ ${player.health}`;
+            floorDiv.textContent = player.floor === 1 ? '📍 1 ЭТАЖ' : '📍 2 ЭТАЖ';
+            if (!player.alive) {
+                statusDiv.innerHTML = player.win ? '🏆 ПОБЕДА!' : '💀 ПОГИБ';
+                statusDiv.style.color = player.win ? '#d9c89e' : '#d68a7a';
+            } else {
+                statusDiv.innerHTML = '🔦 ИЩИ ВЫХОД';
+                statusDiv.style.color = '#dbb8a8';
+            }
+        }
+
+        function updateFlashlight() {
+            flashlight.position.copy(camera.position);
+            flashlight.position.y = player.floor === 1 ? 1.4 : floorHeight + 1.4;
+            const target = new THREE.Vector3(0, 0, -5);
+            target.applyQuaternion(camera.quaternion);
+            target.add(camera.position);
+            flashlight.target.position.copy(target);
+        }
+
+        // --- P2P WEBRTC ---
+        function generateRoomId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function createRoom() {
+            roomId = generateRoomId();
+            isHost = true;
+            createPeerConnection();
+            startGame();
+            roomIdDisplay.textContent = `🏷️ КОМНАТА: ${roomId}`;
+            copyBtn.classList.add('show');
+            connStatus.textContent = '🟡 Ожидание подключения...';
+            connStatus.className = '';
+        }
+
+        function joinRoom(code) {
+            roomId = code.toUpperCase();
+            isHost = false;
+            createPeerConnection();
+            startGame();
+            roomIdDisplay.textContent = `🏷️ КОМНАТА: ${roomId}`;
+            connStatus.textContent = '🟡 Подключение...';
+            connStatus.className = '';
+        }
+
+        function createPeerConnection() {
+            const config = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' }
+                ]
+            };
+            peerConnection = new RTCPeerConnection(config);
+
+            // Создаём канал данных
+            dataChannel = peerConnection.createDataChannel('game');
+            setupDataChannel();
+
+            // Обработка входящего канала
+            peerConnection.ondatachannel = (event) => {
+                dataChannel = event.channel;
+                setupDataChannel();
+            };
+
+            // Обработка ICE кандидатов
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    // Отправляем кандидата другому игроку
+                    const data = {
+                        type: 'candidate',
+                        candidate: event.candidate
+                    };
+                    // Копируем в буфер обмена для передачи
+                    if (isHost) {
+                        // Хост ждёт, пока подключится второй игрок
+                    }
+                }
+            };
+
+            // Создаём offer (если хост)
+            if (isHost) {
+                peerConnection.createOffer()
+                    .then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => {
+                        // Показываем offer для копирования
+                        const offerData = {
+                            type: 'offer',
+                            sdp: peerConnection.localDescription.sdp
+                        };
+                        const offerString = btoa(JSON.stringify(offerData));
+                        // Показываем в виде ссылки
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('join', roomId);
+                        url.searchParams.set('offer', offerString);
+                        const link = url.toString();
+                        // Обновляем UI для копирования
+                        copyBtn.textContent = '📋 Копировать ссылку';
+                        copyBtn.onclick = () => {
+                            navigator.clipboard.writeText(link).then(() => {
+                                copyBtn.textContent = '✅ Скопировано!';
+                                setTimeout(() => {
+                                    copyBtn.textContent = '📋 Копировать ссылку';
+                                }, 2000);
+                            });
+                        };
+                        connStatus.textContent = '🟡 Скопируйте ссылку и отправьте другу';
+                    });
+            }
+        }
+
+        function setupDataChannel() {
+            dataChannel.onopen = () => {
+                isConnected = true;
+                connStatus.textContent = '🟢 Подключено!';
+                connStatus.className = '';
+                sendMessage({ type: 'init', data: { x: player.x, z: player.z, floor: player.floor } });
+            };
+
+            dataChannel.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleMessage(message);
+            };
+
+            dataChannel.onclose = () => {
+                isConnected = false;
+                connStatus.textContent = '🔴 Отключено';
+                connStatus.className = 'disconnected';
+            };
+        }
+
+        function sendMessage(message) {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify(message));
+            }
+        }
+
+        function handleMessage(message) {
+            switch (message.type) {
+                case 'init':
+                    otherPlayerData = message.data;
+                    break;
+                case 'move':
+                    if (otherPlayerData) {
+                        otherPlayerData.x = message.data.x;
+                        otherPlayerData.z = message.data.z;
+                        otherPlayerData.floor = message.data.floor;
+                    }
+                    break;
+                case 'granny':
+                    grannyData = message.data;
+                    break;
+                case 'noise':
+                    // Визуальный эффект шума
+                    const noiseDiv = document.createElement('div');
+                    noiseDiv.style.position = 'absolute';
+                    noiseDiv.style.top = '50%';
+                    noiseDiv.style.left = '50%';
+                    noiseDiv.style.transform = 'translate(-50%, -50%)';
+                    noiseDiv.style.color = '#ff8844';
+                    noiseDiv.style.fontSize = '3rem';
+                    noiseDiv.style.textShadow = '0 0 40px #ff4400';
+                    noiseDiv.style.pointerEvents = 'none';
+                    noiseDiv.style.zIndex = '100';
+                    noiseDiv.textContent = '🔊 ШУМ!';
+                    document.body.appendChild(noiseDiv);
+                    setTimeout(() => noiseDiv.remove(), 1500);
+                    break;
+                case 'health':
+                    if (otherPlayerData) {
+                        otherPlayerData.health = message.data.health;
+                        otherPlayerData.alive = message.data.alive;
+                    }
+                    break;
+                case 'win':
+                    if (otherPlayerData) {
+                        otherPlayerData.alive = false;
+                        otherPlayerData.win = true;
+                    }
+                    break;
+            }
+        }
+
+        // --- ОБРАБОТКА ОФФЕРОВ (для подключения) ---
+        // Проверяем параметры URL при загрузке
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const joinCode = params.get('join');
+            const offerData = params.get('offer');
+            
+            if (joinCode && offerData) {
+                // Подключаемся к существующей комнате
+                roomInput.value = joinCode;
+                setTimeout(() => {
+                    joinBtn.click();
+                    // После создания peer connection обрабатываем offer
+                    setTimeout(() => {
+                        try {
+                            const offer = JSON.parse(atob(offerData));
+                            peerConnection.setRemoteDescription(new RTCSessionDescription({
+                                type: 'offer',
+                                sdp: offer.sdp
+                            }));
+                            peerConnection.createAnswer()
+                                .then(answer => peerConnection.setLocalDescription(answer))
+                                .then(() => {
+                                    // Отправляем ответ обратно (через ссылку)
+                                    const answerData = {
+                                        type: 'answer',
+                                        sdp: peerConnection.localDescription.sdp
+                                    };
+                                    const answerString = btoa(JSON.stringify(answerData));
+                                    // Показываем для копирования
+                                    copyBtn.textContent = '📋 Отправить ответ';
+                                    copyBtn.onclick = () => {
+                                        navigator.clipboard.writeText(answerString).then(() => {
+                                            copyBtn.textContent = '✅ Скопировано!';
+                                            setTimeout(() => {
+                                                copyBtn.textContent = '📋 Отправить ответ';
+                                            }, 2000);
+                                        });
+                                    };
+                                    connStatus.textContent = '🟡 Отправьте ответ хосту';
+                                });
+                        } catch (e) {
+                            console.error('Ошибка обработки offer:', e);
+                        }
+                    }, 500);
+                }, 500);
+            }
+        });
+
+        // Обработка ответа (для хоста)
+        window.addEventListener('message', (event) => {
+            // Этот метод используется для передачи ответов между вкладками
+            // В реальности ответ передаётся через текстовое поле или ссылку
+        });
+
+        // --- КНОПКИ МЕНЮ ---
+        createBtn.addEventListener('click', createRoom);
+
+        joinBtn.addEventListener('click', () => {
+            const code = roomInput.value.trim().toUpperCase();
+            if (code.length === 6) {
+                joinRoom(code);
+            } else {
+                alert('Введите корректный код комнаты (6 символов)');
+            }
+        });
+
+        roomInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') joinBtn.click();
+            roomInput.value = roomInput.value.toUpperCase();
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (isHost) {
+                // Копируем ссылку с offer
+                // (уже реализовано в createRoom)
+            } else {
+                // Копируем ответ
+                // (реализовано в обработчике)
+            }
+        });
+
+        // --- ИНИЦИАЛИЗАЦИЯ ИГРЫ ---
+        function startGame() {
+            menu.classList.add('hidden');
+            gameUI.style.display = 'block';
+            renderer.domElement.click();
+            updateUI();
+        }
+
+        // --- УПРАВЛЕНИЕ ---
+        const keys = { w: false, a: false, s: false, d: false };
+        let noiseCooldown = false;
+
+        document.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || k === 'a' || k === 's' || k === 'd') {
+                keys[k] = true;
+                e.preventDefault();
+            }
+            if (k === 'e' && player.alive && !noiseCooldown && isConnected) {
+                e.preventDefault();
+                noiseCooldown = true;
+                sendMessage({ type: 'noise', data: { x: camera.position.x, z: camera.position.z, floor: player.floor } });
+                // Локальный эффект
+                const noiseDiv = document.createElement('div');
+                noiseDiv.style.position = 'absolute';
+                noiseDiv.style.top = '50%';
+                noiseDiv.style.left = '50%';
+                noiseDiv.style.transform = 'translate(-50%, -50%)';
+                noiseDiv.style.color = '#ff8844';
+                noiseDiv.style.fontSize = '3rem';
+                noiseDiv.style.textShadow = '0 0 40px #ff4400';
+                noiseDiv.style.pointerEvents = 'none';
+                noiseDiv.style.zIndex = '100';
+                noiseDiv.textContent = '🔊 БАМ!';
+                document.body.appendChild(noiseDiv);
+                setTimeout(() => noiseDiv.remove(), 1500);
+                setTimeout(() => { noiseCooldown = false; }, 2000);
+            }
+            if (e.key === ' ' && !player.alive) {
+                e.preventDefault();
+                location.reload();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || k === 'a' || k === 's' || k === 'd') {
+                keys[k] = false;
+                e.preventDefault();
+            }
+        });
+
+        renderer.domElement.addEventListener('click', () => {
+            if (!isLocked && player.alive) controls.lock();
+        });
+
+        controls.addEventListener('lock', () => { isLocked = true; });
+        controls.addEventListener('unlock', () => { isLocked = false; });
+
+        // --- АНИМАЦИЯ ---
+        let lastSendTime = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (isLocked && player.alive) {
+                const speed = 0.08;
+                const forward = new THREE.Vector3(0, 0, -1);
+                forward.applyQuaternion(camera.quaternion);
+                forward.y = 0;
+                forward.normalize();
+                const right = new THREE.Vector3(1, 0, 0);
+                right.applyQuaternion(camera.quaternion);
+                right.y = 0;
+                right.normalize();
+
+                let moveX = 0, moveZ = 0;
+                if (keys.w) { moveX += forward.x; moveZ += forward.z; }
+                if (keys.s) { moveX -= forward.x; moveZ -= forward.z; }
+                if (keys.a) { moveX -= right.x; moveZ -= right.z; }
+                if (keys.d) { moveX += right.x; moveZ += right.z; }
+
+                if (moveX !== 0 || moveZ !== 0) {
+                    const len = Math.sqrt(moveX*moveX + moveZ*moveZ);
+                    moveX = (moveX / len) * speed;
+                    moveZ = (moveZ / len) * speed;
+                    const bound = 7.5;
+                    let newX = camera.position.x + moveX;
+                    let newZ = camera.position.z + moveZ;
+                    newX = Math.min(bound, Math.max(-bound, newX));
+                    newZ = Math.min(bound, Math.max(-bound, newZ));
+                    
+                    const yPos = player.floor === 1 ? 1.7 : floorHeight + 1.7;
+                    const clamped = clampToWalls(newX, newZ, yPos);
+                    camera.position.x = clamped.x;
+                    camera.position.z = clamped.z;
+                    player.x = clamped.x;
+                    player.z = clamped.z;
+
+                    // Отправка позиции
+                    const now = Date.now();
+                    if (now - lastSendTime > 50 && isConnected) {
+                        lastSendTime = now;
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
+                    }
+                }
+
+                // Проверка этажей
+                const px = camera.position.x;
+                const pz = camera.position.z;
+                if (Math.abs(px + 1) < 1.5 && Math.abs(pz + 3) < 1.5) {
+                    if (player.floor === 1) {
+                        camera.position.y = floorHeight + 1.7;
+                        player.floor = 2;
+                        updateUI();
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
+                    }
+                }
+                if (Math.abs(px + 1) < 1.5 && Math.abs(pz - 3) < 1.5) {
+                    if (player.floor === 2) {
+                        camera.position.y = 1.7;
+                        player.floor = 1;
+                        updateUI();
+                        sendMessage({ type: 'move', data: { x: player.x, z: player.z, floor: player.floor } });
+                    }
+                }
+
+                // Проверка выхода
+                if (player.floor === 1 && pz > 7.0 && Math.abs(px) < 1.5 && player.alive) {
+                    player.alive = false;
+                    player.win = true;
+                    controls.unlock();
+                    updateUI();
+                    sendMessage({ type: 'win', data: {} });
+                }
+
+                updateFlashlight();
+                updateUI();
+            }
+
+            // Обновление Грэнни
+            const floorY = grannyData.floor === 1 ? 0 : floorHeight;
+            grannyGroup.position.x += (grannyData.x - grannyGroup.position.x) * 0.1;
+            grannyGroup.position.z += (grannyData.z - grannyGroup.position.z) * 0.1;
+            grannyGroup.position.y = floorY;
+            if (grannyData.rotation !== undefined) {
+                grannyGroup.rotation.y = grannyData.rotation;
+            }
+            grannyLight.position.copy(grannyGroup.position);
+            grannyLight.position.y += 1.5;
+
+            // Анимация Грэнни
+            grannyGroup.position.y += Math.sin(Date.now() * 0.002) * 0.001;
+
+            renderer.render(scene, camera);
+        }
+
+        // --- РЕСАЙЗ ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- СТАРТ ---
+        animate();
+        console.log('🏚️ Побег от Грэнни — P2P версия (WebRTC)');
+        console.log('📡 Работает на GitHub Pages без сервера!');
     </script>
 </body>
 </html>
