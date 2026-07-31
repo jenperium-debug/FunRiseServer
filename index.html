@@ -3,525 +3,614 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Побег из дома · Хоррор</title>
+    <title>3D Хоррор · Побег из дома</title>
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-        }
         body {
             margin: 0;
-            min-height: 100vh;
-            background: #0b0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            background: #0a0505;
+            font-family: 'Courier New', monospace;
         }
-        .game-wrapper {
-            background: #1d1616;
-            padding: 20px 20px 25px;
-            border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 2px #4a2e2e inset;
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #d9b8a8;
+            background: rgba(10, 5, 5, 0.75);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border-left: 3px solid #a54444;
+            pointer-events: none;
+            z-index: 10;
+            text-shadow: 0 0 12px #3f1a1a;
+            user-select: none;
+            backdrop-filter: blur(2px);
         }
-        canvas {
-            display: block;
-            margin: 0 auto;
-            width: 800px;
-            height: 600px;
-            border-radius: 20px;
-            box-shadow: 0 0 0 3px #2f1e1e, 0 10px 30px #000000aa;
-            background: #191212;
-            cursor: crosshair;
-        }
-        .ui-panel {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 16px 10px 0 10px;
-            color: #b7a09a;
-            text-shadow: 0 0 8px #4f2626;
-            font-weight: bold;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-        .ui-panel span {
-            background: #251d1d;
-            padding: 8px 22px;
+        #health {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            color: #e0b0a0;
+            font-size: 1.8rem;
+            background: #140b0bcc;
+            padding: 6px 24px;
             border-radius: 60px;
-            border: 1px solid #674a4a;
-            box-shadow: 0 0 12px #3f1f1f;
+            border: 1px solid #884444;
+            box-shadow: 0 0 30px #441111;
+            backdrop-filter: blur(3px);
+            letter-spacing: 2px;
+            z-index: 10;
+            user-select: none;
         }
-        .restart-btn {
-            background: #2f1b1b;
-            border: none;
-            color: #e6d3cb;
-            font-size: 1.2rem;
+        #status {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            color: #dbb8a8;
+            font-size: 1.4rem;
+            background: #0f0808dd;
+            padding: 8px 28px;
+            border-radius: 60px;
+            border: 1px solid #7a4a4a;
+            backdrop-filter: blur(3px);
+            z-index: 10;
+            user-select: none;
+            text-align: center;
+            min-width: 140px;
+        }
+        #controls {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #a77a6a;
+            background: #1a0e0ed4;
+            padding: 8px 24px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            border: 1px solid #5f3a3a;
+            backdrop-filter: blur(4px);
+            letter-spacing: 1px;
+            z-index: 10;
+            white-space: nowrap;
+            user-select: none;
+        }
+        #restartBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #2d1717;
+            border: 1px solid #a55353;
+            color: #f0d6c6;
+            font-size: 1.1rem;
             font-weight: bold;
             padding: 8px 24px;
             border-radius: 60px;
-            border: 1px solid #975a5a;
-            box-shadow: 0 0 12px #6f2e2e;
             cursor: pointer;
-            transition: all 0.15s;
-            font-family: inherit;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 20px #631f1f;
+            transition: 0.15s;
+            z-index: 20;
             letter-spacing: 1px;
+            backdrop-filter: blur(3px);
+            background: #1a0d0dd4;
         }
-        .restart-btn:hover {
-            background: #4f2b2b;
-            border-color: #c97a7a;
-            color: #fff0e6;
-            box-shadow: 0 0 20px #a33f3f;
-            transform: scale(0.97);
+        #restartBtn:hover {
+            background: #4d2626;
+            border-color: #d67a7a;
+            transform: scale(0.96);
+            box-shadow: 0 0 30px #aa3f3f;
         }
-        .death-message {
-            color: #d99b8b;
-            font-size: 1.4rem;
-            text-shadow: 0 0 20px #b13b3b;
-            background: #1d1111;
-            padding: 6px 20px;
-            border-radius: 60px;
-            border: 1px solid #a55353;
+        a {
+            color: #b98a7a;
         }
-        @media (max-width: 840px) {
-            canvas { width: 100%; height: auto; aspect-ratio: 4/3; }
-            .game-wrapper { padding: 10px; }
-            .ui-panel { flex-wrap: wrap; gap: 10px; justify-content: center; }
+        @media (max-width: 700px) {
+            #health { font-size: 1.3rem; padding: 4px 16px; }
+            #status { font-size: 1.0rem; padding: 4px 16px; min-width: 100px; }
+            #controls { font-size: 0.7rem; padding: 4px 12px; bottom: 80px; }
         }
     </style>
 </head>
 <body>
-<div class="game-wrapper">
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div class="ui-panel">
-        <span id="statusDisplay">🔦 Ищи выход</span>
-        <span id="healthDisplay">❤️ 3</span>
-        <button class="restart-btn" id="restartButton">⟳ Заново</button>
-    </div>
-</div>
-<script>
-    (function() {
-        const canvas = document.getElementById('gameCanvas');
+    <div id="info">🏚️ 3D ХОРРОР · НЕ УМРИ</div>
+    <div id="health">❤️ 3</div>
+    <div id="status">🔦 Ищи выход</div>
+    <div id="controls">WASD — ходьба · мышь — взгляд</div>
+    <button id="restartBtn">⟳ Заново</button>
+
+    <!-- Импорт Three.js и доп. библиотек -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.126.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.126.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
+        // --- Инициализация сцены ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0707);
+        scene.fog = new THREE.FogExp2(0x0b0707, 0.008);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 60);
+        camera.position.set(5, 1.7, 5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.appendChild(renderer.domElement);
+
+        // --- Управление с блокировкой указателя ---
+        const controls = new PointerLockControls(camera, renderer.domElement);
+        let isLocked = false;
+        controls.lockSpeed = 0.002;
+
+        // --- Освещение ---
+        // Ambient (тусклый)
+        const ambient = new THREE.AmbientLight(0x332222, 0.35);
+        scene.add(ambient);
+
+        // Основной свет (свечение из центра)
+        const mainLight = new THREE.PointLight(0xffaa66, 0.9, 35);
+        mainLight.position.set(0, 4, 0);
+        scene.add(mainLight);
+        
+        // Вспомогательные тёмные свечи
+        const light2 = new THREE.PointLight(0x885533, 0.4, 25);
+        light2.position.set(-6, 2, 6);
+        scene.add(light2);
+        const light3 = new THREE.PointLight(0x663322, 0.3, 25);
+        light3.position.set(7, 1.5, -5);
+        scene.add(light3);
+
+        // Свет от игрока (фонарик)
+        const flashlight = new THREE.SpotLight(0xffd09a, 1.8, 22, Math.PI / 5.5, 0.45, 1.2);
+        flashlight.position.set(0, 1.6, 0);
+        flashlight.target.position.set(0, 0, -5);
+        scene.add(flashlight);
+        scene.add(flashlight.target);
+
+        // --- Пол (тёмный) ---
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: 0x2a1a1a,
+            roughness: 0.9,
+            metalness: 0.1,
+            emissive: 0x0f0808,
+            emissiveIntensity: 0.2
+        });
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -0.01;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // --- Стены (комната 20x20) ---
+        function createWall(w, h, pos, rotY = 0, color = 0x2f1a1a) {
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.95,
+                metalness: 0.0,
+                emissive: 0x0d0808,
+                emissiveIntensity: 0.1
+            });
+            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.3), mat);
+            wall.position.set(pos.x, pos.y, pos.z);
+            wall.rotation.y = rotY;
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            scene.add(wall);
+            return wall;
+        }
+
+        // Стены: задняя, левая, правая, передняя (с проёмом для выхода)
+        createWall(20, 4, { x: 0, y: 2, z: -10 }, 0);
+        createWall(20, 4, { x: -10, y: 2, z: 0 }, Math.PI/2);
+        createWall(20, 4, { x: 10, y: 2, z: 0 }, Math.PI/2);
+        // Передняя стена с дверным проёмом (два куска)
+        const wallMat = new THREE.MeshStandardMaterial({
+            color: 0x2f1a1a,
+            roughness: 0.95,
+            metalness: 0.0,
+            emissive: 0x0d0808,
+            emissiveIntensity: 0.1
+        });
+        const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(8.5, 4, 0.3), wallMat);
+        wallLeft.position.set(-3.25, 2, 10);
+        wallLeft.castShadow = true;
+        wallLeft.receiveShadow = true;
+        scene.add(wallLeft);
+
+        const wallRight = new THREE.Mesh(new THREE.BoxGeometry(8.5, 4, 0.3), wallMat);
+        wallRight.position.set(3.25, 2, 10);
+        wallRight.castShadow = true;
+        wallRight.receiveShadow = true;
+        scene.add(wallRight);
+
+        // Верхняя часть над проёмом
+        const wallTop = new THREE.Mesh(new THREE.BoxGeometry(4, 1.2, 0.3), wallMat);
+        wallTop.position.set(0, 3.6, 10);
+        wallTop.castShadow = true;
+        wallTop.receiveShadow = true;
+        scene.add(wallTop);
+
+        // --- Половицы (декор) ---
+        for (let i = -9; i < 10; i+=1.2) {
+            const plank = new THREE.Mesh(
+                new THREE.BoxGeometry(0.08, 0.01, 0.6),
+                new THREE.MeshStandardMaterial({ color: 0x3d2626, roughness: 1, emissive: 0x0d0707 })
+            );
+            plank.position.set(i * 0.9, 0.01, 0);
+            plank.rotation.z = 0.02;
+            scene.add(plank);
+        }
+
+        // --- Выход (светящаяся дверь) ---
+        const exitGroup = new THREE.Group();
+        const doorMat = new THREE.MeshStandardMaterial({
+            color: 0x7a4f2a,
+            emissive: 0xac6f3a,
+            emissiveIntensity: 0.5,
+            roughness: 0.4,
+            metalness: 0.3
+        });
+        const door = new THREE.Mesh(new THREE.BoxGeometry(2.8, 3.2, 0.3), doorMat);
+        door.position.set(0, 1.7, 10.15);
+        door.castShadow = true;
+        scene.add(door);
+
+        // Свет над дверью
+        const exitLight = new THREE.PointLight(0xffaa55, 1.5, 12);
+        exitLight.position.set(0, 3.5, 9.5);
+        scene.add(exitLight);
+
+        // Ручка двери (золотая)
+        const handleMat = new THREE.MeshStandardMaterial({ color: 0xc99f5e, emissive: 0x553322, emissiveIntensity: 0.3 });
+        const handle = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), handleMat);
+        handle.position.set(1.1, 1.6, 10.4);
+        scene.add(handle);
+
+        // Текст "ВЫХОД" (спрайт)
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 64;
         const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#4f2e1a';
+        ctx.fillRect(0, 0, 128, 64);
+        ctx.font = 'bold 32px "Courier New", monospace';
+        ctx.fillStyle = '#f0d090';
+        ctx.shadowColor = '#ffaa33';
+        ctx.shadowBlur = 14;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🚪 ВЫХОД', 64, 34);
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
+        const label = new THREE.Sprite(spriteMat);
+        label.position.set(0, 3.2, 10.6);
+        label.scale.set(2.2, 1.1, 1);
+        scene.add(label);
 
-        // ------ Игровые константы ------
-        const PLAYER_RADIUS = 16;
-        const ENEMY_RADIUS = 22;
-        const EXIT_RADIUS = 26;
-        const SPEED = 2.8;
-        const ENEMY_SPEED = 1.1;
+        // --- Враги (монстры) ---
+        const enemies = [];
+        function createEnemy(x, z) {
+            const group = new THREE.Group();
+            // тело
+            const bodyMat = new THREE.MeshStandardMaterial({
+                color: 0x3d1515,
+                roughness: 0.8,
+                emissive: 0x2a0a0a,
+                emissiveIntensity: 0.2
+            });
+            const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 12, 12), bodyMat);
+            body.position.y = 0.8;
+            body.castShadow = true;
+            group.add(body);
 
-        // ------ Состояние игры ------
-        let player = { x: 120, y: 120 };
-        let enemies = [];
-        let exit = { x: 710, y: 520 };  // выход в правом нижнем углу
-        let health = 3;
-        let gameActive = true;
-        let win = false;
+            // глаза (светятся)
+            const eyeMat = new THREE.MeshStandardMaterial({
+                color: 0xff5533,
+                emissive: 0xaa2222,
+                emissiveIntensity: 1.0
+            });
+            const eye1 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), eyeMat);
+            eye1.position.set(-0.3, 1.0, 0.5);
+            group.add(eye1);
+            const eye2 = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), eyeMat);
+            eye2.position.set(0.3, 1.0, 0.5);
+            group.add(eye2);
 
-        // ------ Элементы UI ------
-        const statusDisplay = document.getElementById('statusDisplay');
-        const healthDisplay = document.getElementById('healthDisplay');
+            // тёмные зрачки
+            const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+            const p1 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), pupilMat);
+            p1.position.set(-0.35, 1.0, 0.7);
+            group.add(p1);
+            const p2 = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), pupilMat);
+            p2.position.set(0.25, 1.0, 0.7);
+            group.add(p2);
 
-        // ------ Клавиши ------
-        const keys = {
-            w: false, a: false, s: false, d: false
+            group.position.set(x, 0, z);
+            scene.add(group);
+            
+            // добавим небольшое свечение вокруг
+            const glow = new THREE.PointLight(0x882222, 0.35, 5);
+            glow.position.set(x, 0.8, z);
+            scene.add(glow);
+            
+            enemies.push({
+                mesh: group,
+                glow: glow,
+                x: x,
+                z: z,
+                speed: 0.012 + Math.random() * 0.008,
+                phase: Math.random() * 100
+            });
+            return group;
+        }
+
+        createEnemy(-4, -3);
+        createEnemy(5, -5);
+        createEnemy(-3, 5);
+        createEnemy(6, 4);
+        createEnemy(-6, -6);
+
+        // --- Мебель (препятствия) ---
+        function createBox(w, h, d, x, z, color = 0x3a2525) {
+            const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.9, emissive: 0x0d0808 });
+            const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+            box.position.set(x, h/2, z);
+            box.castShadow = true;
+            box.receiveShadow = true;
+            scene.add(box);
+            return box;
+        }
+        createBox(1.6, 1.2, 1.6, -2, -5, 0x4a2a2a);
+        createBox(1.8, 0.8, 1.2, 4, -6, 0x3d2222);
+        createBox(2.0, 1.6, 1.0, -5, 4, 0x4f2e2e);
+        createBox(1.2, 0.6, 2.4, 6, 2, 0x332020);
+
+        // --- Игрок (камера) ---
+        const player = {
+            height: 1.7,
+            radius: 0.5,
+            health: 3,
+            alive: true,
+            win: false
         };
 
-        // ------ Враги (стартовые позиции) ------
-        function resetEnemies() {
-            enemies = [
-                { x: 380, y: 150 },
-                { x: 500, y: 400 },
-                { x: 200, y: 480 },
-                { x: 600, y: 200 }
-            ];
-        }
+        // Для коллизий со стенами и врагами используем простые границы
+        const wallMinX = -9.2, wallMaxX = 9.2, wallMinZ = -9.2, wallMaxZ = 9.2;
 
-        // ------ Полный сброс игры ------
-        function resetGame() {
-            player.x = 120;
-            player.y = 120;
-            health = 3;
-            win = false;
-            gameActive = true;
-            resetEnemies();
-            // выход всегда на месте
-            exit.x = 710;
-            exit.y = 520;
-            updateUI();
-        }
+        // --- UI элементы ---
+        const healthDiv = document.getElementById('health');
+        const statusDiv = document.getElementById('status');
 
-        // ------ Обновление UI ------
         function updateUI() {
-            healthDisplay.textContent = `❤️ ${health}`;
-            if (!gameActive) {
-                if (win) {
-                    statusDisplay.innerHTML = '🏆 ВЫБРАЛСЯ! 🏆';
-                } else {
-                    statusDisplay.innerHTML = '💀 ТЫ УМЕР... 💀';
-                }
+            healthDiv.textContent = `❤️ ${player.health}`;
+            if (!player.alive) {
+                statusDiv.innerHTML = player.win ? '🏆 ПОБЕДА' : '💀 ПОГИБ';
+                statusDiv.style.color = player.win ? '#d9c89e' : '#d68a7a';
             } else {
-                statusDisplay.innerHTML = '🔦 Ищи выход';
+                statusDiv.innerHTML = '🔦 Ищи выход';
+                statusDiv.style.color = '#dbb8a8';
             }
         }
 
-        // ------ Проверка столкновения игрока с врагом ------
+        // --- Функция рестарта ---
+        function resetGame() {
+            camera.position.set(5, 1.7, 5);
+            controls.lock();
+            player.health = 3;
+            player.alive = true;
+            player.win = false;
+            // Возвращаем врагов на стартовые позиции
+            const startPos = [ [-4, -3], [5, -5], [-3, 5], [6, 4], [-6, -6] ];
+            enemies.forEach((e, idx) => {
+                if (idx < startPos.length) {
+                    e.x = startPos[idx][0];
+                    e.z = startPos[idx][1];
+                    e.mesh.position.set(e.x, 0, e.z);
+                    e.glow.position.set(e.x, 0.8, e.z);
+                }
+            });
+            updateUI();
+        }
+
+        // --- Обработка столкновений с врагами ---
         function checkEnemyCollision() {
+            if (!player.alive) return false;
+            const px = camera.position.x;
+            const pz = camera.position.z;
             for (let e of enemies) {
-                const dx = player.x - e.x;
-                const dy = player.y - e.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist < PLAYER_RADIUS + ENEMY_RADIUS) {
+                const dx = px - e.x;
+                const dz = pz - e.z;
+                const dist = Math.sqrt(dx*dx + dz*dz);
+                if (dist < 1.2) {
+                    // урон
+                    player.health -= 1;
+                    if (player.health <= 0) {
+                        player.health = 0;
+                        player.alive = false;
+                        player.win = false;
+                        controls.unlock();
+                        updateUI();
+                        return true;
+                    }
+                    // отбросить игрока
+                    const angle = Math.atan2(dz, dx);
+                    const push = 1.6;
+                    camera.position.x += Math.cos(angle) * push;
+                    camera.position.z += Math.sin(angle) * push;
+                    // ограничить стенами
+                    camera.position.x = Math.min(wallMaxX, Math.max(wallMinX, camera.position.x));
+                    camera.position.z = Math.min(wallMaxZ, Math.max(wallMinZ, camera.position.z));
+                    updateUI();
                     return true;
                 }
             }
             return false;
         }
 
-        // ------ Проверка выхода (победа) ------
-        function checkExitReached() {
-            const dx = player.x - exit.x;
-            const dy = player.y - exit.y;
-            return Math.hypot(dx, dy) < PLAYER_RADIUS + EXIT_RADIUS;
+        // --- Проверка выхода (победа) ---
+        function checkExit() {
+            if (!player.alive) return false;
+            const px = camera.position.x;
+            const pz = camera.position.z;
+            // выход в районе (0, 10)
+            if (pz > 8.5 && Math.abs(px) < 1.8) {
+                player.alive = false;
+                player.win = true;
+                controls.unlock();
+                updateUI();
+                return true;
+            }
+            return false;
         }
 
-        // ------ Обновление игры (движение, логика) ------
-        function update() {
-            if (!gameActive) return;
-
-            // 1. Движение игрока
-            let moveX = 0, moveY = 0;
-            if (keys.w) moveY -= 1;
-            if (keys.s) moveY += 1;
-            if (keys.a) moveX -= 1;
-            if (keys.d) moveX += 1;
-            if (moveX !== 0 || moveY !== 0) {
-                const len = Math.hypot(moveX, moveY);
-                moveX = (moveX / len) * SPEED;
-                moveY = (moveY / len) * SPEED;
-                // Потолок / пол / стены (с учётом радиуса)
-                const newX = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x + moveX));
-                const newY = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y + moveY));
-                player.x = newX;
-                player.y = newY;
-            }
-
-            // 2. Проверка столкновения с врагами (урон)
-            if (checkEnemyCollision()) {
-                health -= 1;
-                if (health <= 0) {
-                    health = 0;
-                    gameActive = false;
-                    win = false;
-                    updateUI();
-                    return; // стоп, игра окончена
-                }
-                // Отбрасываем игрока назад (чтобы не было бесконечного урона)
-                // Отодвинуть от ближайшего врага
-                let closest = null;
-                let closestDist = Infinity;
-                for (let e of enemies) {
-                    const d = Math.hypot(player.x - e.x, player.y - e.y);
-                    if (d < closestDist) {
-                        closestDist = d;
-                        closest = e;
-                    }
-                }
-                if (closest) {
-                    const angle = Math.atan2(player.y - closest.y, player.x - closest.x);
-                    const pushX = Math.cos(angle) * 35;
-                    const pushY = Math.sin(angle) * 35;
-                    player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x + pushX));
-                    player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y + pushY));
-                }
-                updateUI();
-                // после отбрасывания ещё раз проверим, не попали ли снова на врага (но даём иммунитет на кадр)
-                // дополнительная защита: если здоровье >0, но коллизия всё ещё есть — отодвигаем ещё
-                if (gameActive && checkEnemyCollision()) {
-                    // повторный отскок
-                    for (let e of enemies) {
-                        const dx = player.x - e.x;
-                        const dy = player.y - e.y;
-                        const dist = Math.hypot(dx, dy);
-                        if (dist < PLAYER_RADIUS + ENEMY_RADIUS && dist > 0.001) {
-                            const overlap = (PLAYER_RADIUS + ENEMY_RADIUS - dist) * 0.8;
-                            const angle = Math.atan2(dy, dx);
-                            player.x += Math.cos(angle) * overlap;
-                            player.y += Math.sin(angle) * overlap;
-                            // границы
-                            player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x));
-                            player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y));
-                        }
-                    }
-                }
-            }
-
-            // 3. Проверка победы (выход)
-            if (checkExitReached()) {
-                gameActive = false;
-                win = true;
-                updateUI();
-                return;
-            }
-
-            // 4. Движение врагов (к игроку, но с шумом)
+        // --- Движение врагов (преследование) ---
+        function updateEnemies() {
+            if (!player.alive) return;
+            const px = camera.position.x;
+            const pz = camera.position.z;
             for (let e of enemies) {
-                const dx = player.x - e.x;
-                const dy = player.y - e.y;
-                const dist = Math.hypot(dx, dy);
-                if (dist > 1) {
-                    const step = Math.min(ENEMY_SPEED, dist);
-                    // небольшой случайный джиттер, чтобы не шли точно в ногу
-                    const jitterX = (Math.random() - 0.5) * 0.9;
-                    const jitterY = (Math.random() - 0.5) * 0.9;
-                    const normX = dx / dist + jitterX * 0.15;
-                    const normY = dy / dist + jitterY * 0.15;
-                    const lenNorm = Math.hypot(normX, normY);
-                    if (lenNorm > 0.01) {
-                        const moveX = (normX / lenNorm) * step;
-                        const moveY = (normY / lenNorm) * step;
-                        e.x = Math.min(780 - ENEMY_RADIUS, Math.max(ENEMY_RADIUS, e.x + moveX));
-                        e.y = Math.min(580 - ENEMY_RADIUS, Math.max(ENEMY_RADIUS, e.y + moveY));
-                    }
+                const dx = px - e.x;
+                const dz = pz - e.z;
+                const dist = Math.sqrt(dx*dx + dz*dz);
+                if (dist > 0.3 && dist < 12) {
+                    const move = e.speed * 1.2;
+                    const angle = Math.atan2(dz, dx);
+                    // немного случайного блуждания
+                    const wobble = Math.sin(Date.now() * 0.001 + e.phase) * 0.02;
+                    const newX = e.x + Math.cos(angle + wobble) * move;
+                    const newZ = e.z + Math.sin(angle + wobble) * move;
+                    // ограничить стенами
+                    e.x = Math.min(wallMaxX-0.5, Math.max(wallMinX+0.5, newX));
+                    e.z = Math.min(wallMaxZ-0.5, Math.max(wallMinZ+0.5, newZ));
+                    e.mesh.position.set(e.x, 0, e.z);
+                    e.glow.position.set(e.x, 0.8, e.z);
+                    // вращаем морду к игроку
+                    const lookAngle = Math.atan2(dz, dx);
+                    e.mesh.rotation.y = lookAngle;
                 }
             }
-
-            // (Небольшая проверка после движения врагов: если игрок на враге — урон)
-            if (gameActive && checkEnemyCollision()) {
-                health -= 1;
-                if (health <= 0) {
-                    health = 0;
-                    gameActive = false;
-                    win = false;
-                    updateUI();
-                    return;
-                }
-                // оттолкнуть
-                for (let e of enemies) {
-                    const dx = player.x - e.x;
-                    const dy = player.y - e.y;
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < PLAYER_RADIUS + ENEMY_RADIUS && dist > 0.001) {
-                        const overlap = (PLAYER_RADIUS + ENEMY_RADIUS - dist) * 0.9;
-                        const angle = Math.atan2(dy, dx);
-                        player.x += Math.cos(angle) * overlap;
-                        player.y += Math.sin(angle) * overlap;
-                        player.x = Math.min(780 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.x));
-                        player.y = Math.min(580 - PLAYER_RADIUS, Math.max(PLAYER_RADIUS, player.y));
-                    }
-                }
-                updateUI();
-            }
-
-            // Если здоровье упало до 0 (повторная проверка)
-            if (health <= 0 && gameActive) {
-                health = 0;
-                gameActive = false;
-                win = false;
-                updateUI();
-            }
         }
 
-        // ------ Отрисовка ------
-        function draw() {
-            ctx.clearRect(0, 0, 800, 600);
-
-            // --- Пол / текстура (жуткий дом) ---
-            const grad = ctx.createRadialGradient(300, 200, 50, 400, 300, 500);
-            grad.addColorStop(0, '#322121');
-            grad.addColorStop(1, '#120c0c');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 800, 600);
-
-            // линии пола (эффект половиц)
-            ctx.strokeStyle = '#3b2828';
-            ctx.lineWidth = 2.5;
-            for (let i = 0; i < 20; i++) {
-                const y = 30 + i * 30;
-                ctx.beginPath();
-                ctx.moveTo(0, y + Math.sin(i * 0.9) * 8);
-                ctx.lineTo(800, y + Math.cos(i * 0.7) * 8 + 4);
-                ctx.strokeStyle = `rgba(70, 45, 45, ${0.2 + i * 0.015})`;
-                ctx.stroke();
+        // --- Блокировка / разблокировка мыши ---
+        renderer.domElement.addEventListener('click', () => {
+            if (!isLocked && player.alive) {
+                controls.lock();
             }
-
-            // --- Выход (дверь) ---
-            ctx.shadowColor = '#b56f3a';
-            ctx.shadowBlur = 35;
-            ctx.beginPath();
-            ctx.arc(exit.x, exit.y, EXIT_RADIUS, 0, Math.PI * 2);
-            ctx.fillStyle = '#b97c4a';
-            ctx.fill();
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = '#e6b17e';
-            ctx.font = 'bold 26px "Courier New", monospace';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🚪', exit.x, exit.y - 2);
-            ctx.shadowBlur = 0;
-
-            // --- Враги (монстры) ---
-            for (let e of enemies) {
-                // тень
-                ctx.shadowColor = '#b33a3a';
-                ctx.shadowBlur = 40;
-                // тело
-                ctx.beginPath();
-                ctx.arc(e.x, e.y, ENEMY_RADIUS, 0, Math.PI * 2);
-                const grd = ctx.createRadialGradient(e.x-8, e.y-8, 6, e.x, e.y, ENEMY_RADIUS+4);
-                grd.addColorStop(0, '#691f1f');
-                grd.addColorStop(0.7, '#2d0d0d');
-                ctx.fillStyle = grd;
-                ctx.fill();
-                // глаза
-                ctx.shadowBlur = 12;
-                ctx.fillStyle = '#f0d8b0';
-                ctx.beginPath();
-                ctx.arc(e.x-10, e.y-7, 7, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(e.x+10, e.y-7, 7, 0, Math.PI*2);
-                ctx.fill();
-                ctx.fillStyle = '#1f0808';
-                ctx.beginPath();
-                ctx.arc(e.x-12, e.y-5, 3.5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(e.x+8, e.y-5, 3.5, 0, Math.PI*2);
-                ctx.fill();
-                // зрачки (красные)
-                ctx.fillStyle = '#d64444';
-                ctx.shadowBlur = 20;
-                ctx.beginPath();
-                ctx.arc(e.x-14, e.y-9, 1.8, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(e.x+6, e.y-9, 1.8, 0, Math.PI*2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            // --- Игрок (фонарик) ---
-            ctx.shadowColor = '#bd8a4b';
-            ctx.shadowBlur = 40;
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, PLAYER_RADIUS, 0, Math.PI * 2);
-            const pGrad = ctx.createRadialGradient(player.x-6, player.y-6, 5, player.x, player.y, PLAYER_RADIUS+6);
-            pGrad.addColorStop(0, '#dab88b');
-            pGrad.addColorStop(0.8, '#7a4d2a');
-            ctx.fillStyle = pGrad;
-            ctx.fill();
-            // глаза игрока (белые)
-            ctx.shadowBlur = 10;
-            ctx.fillStyle = '#f0eee6';
-            ctx.beginPath();
-            ctx.arc(player.x-7, player.y-4, 5, 0, Math.PI*2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(player.x+7, player.y-4, 5, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = '#1f1a14';
-            ctx.beginPath();
-            ctx.arc(player.x-9, player.y-2, 2.5, 0, Math.PI*2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(player.x+5, player.y-2, 2.5, 0, Math.PI*2);
-            ctx.fill();
-            // свет фонарика (конус)
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = 'rgba(255, 200, 100, 0.08)';
-            ctx.beginPath();
-            ctx.moveTo(player.x, player.y);
-            ctx.arc(player.x, player.y, 140, -0.9, 0.9);
-            ctx.fill();
-
-            // --- Детали: кровь на полу (декор) ---
-            ctx.shadowBlur = 0;
-            for (let i=0; i<6; i++) {
-                ctx.fillStyle = `rgba(110, 20, 20, ${0.05 + i*0.02})`;
-                ctx.beginPath();
-                ctx.arc(70 + i*130, 500 + Math.sin(i)*18, 12 + i*5, 0, Math.PI*2);
-                ctx.fill();
-            }
-
-            // Если игра окончена — затемнение и текст
-            if (!gameActive) {
-                ctx.fillStyle = 'rgba(0,0,0,0.55)';
-                ctx.fillRect(0, 0, 800, 600);
-                ctx.font = 'bold 52px "Courier New", monospace';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowBlur = 30;
-                if (win) {
-                    ctx.fillStyle = '#d9c89e';
-                    ctx.shadowColor = '#e8b86a';
-                    ctx.fillText('🔓 ВЫБРАЛСЯ', 400, 260);
-                    ctx.font = '24px monospace';
-                    ctx.fillStyle = '#c7b29b';
-                    ctx.fillText('Свобода...', 400, 350);
-                } else {
-                    ctx.fillStyle = '#d3a08a';
-                    ctx.shadowColor = '#bd3f3f';
-                    ctx.fillText('💀 ПОГИБ 💀', 400, 260);
-                    ctx.font = '24px monospace';
-                    ctx.fillStyle = '#b28070';
-                    ctx.fillText('Тьма поглотила тебя...', 400, 350);
-                }
-                ctx.shadowBlur = 0;
-            }
-        }
-
-        // ------ Игровой цикл ------
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-
-        // ------ Обработка клавиш ------
-        function keyDownHandler(e) {
-            const key = e.key.toLowerCase();
-            if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
-                e.preventDefault();
-                keys[key] = true;
-            }
-            // стрелки тоже (для удобства)
-            if (e.key === 'ArrowUp') { e.preventDefault(); keys.w = true; }
-            if (e.key === 'ArrowDown') { e.preventDefault(); keys.s = true; }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); keys.a = true; }
-            if (e.key === 'ArrowRight') { e.preventDefault(); keys.d = true; }
-        }
-        function keyUpHandler(e) {
-            const key = e.key.toLowerCase();
-            if (key === 'w' || key === 'a' || key === 's' || key === 'd') {
-                e.preventDefault();
-                keys[key] = false;
-            }
-            if (e.key === 'ArrowUp') { e.preventDefault(); keys.w = false; }
-            if (e.key === 'ArrowDown') { e.preventDefault(); keys.s = false; }
-            if (e.key === 'ArrowLeft') { e.preventDefault(); keys.a = false; }
-            if (e.key === 'ArrowRight') { e.preventDefault(); keys.d = false; }
-        }
-        window.addEventListener('keydown', keyDownHandler);
-        window.addEventListener('keyup', keyUpHandler);
-
-        // ------ Кнопка рестарта ------
-        document.getElementById('restartButton').addEventListener('click', () => {
-            resetGame();
-            updateUI();
         });
 
-        // ------ Инициализация ------
-        resetGame();
-        updateUI();
-        gameLoop();
+        controls.addEventListener('lock', () => { isLocked = true; });
+        controls.addEventListener('unlock', () => { isLocked = false; });
 
-        // защита от скролла при стрелках
-        window.addEventListener('keydown', (e) => {
-            if (e.key.startsWith('Arrow')) e.preventDefault();
-        }, { passive: false });
-    })();
-</script>
+        // --- Клавиши WASD ---
+        const keyState = { w: false, a: false, s: false, d: false };
+        document.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || k === 'a' || k === 's' || k === 'd') {
+                keyState[k] = true;
+                e.preventDefault();
+            }
+            if (e.key === ' ' && !player.alive) {
+                e.preventDefault();
+                resetGame();
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 'w' || k === 'a' || k === 's' || k === 'd') {
+                keyState[k] = false;
+                e.preventDefault();
+            }
+        });
+
+        // --- Кнопка рестарта ---
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            resetGame();
+        });
+
+        // --- Анимация ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Движение игрока (WASD) с учётом направления камеры
+            if (isLocked && player.alive) {
+                const speed = 0.08;
+                const forward = new THREE.Vector3(0, 0, -1);
+                forward.applyQuaternion(camera.quaternion);
+                forward.y = 0;
+                forward.normalize();
+                const right = new THREE.Vector3(1, 0, 0);
+                right.applyQuaternion(camera.quaternion);
+                right.y = 0;
+                right.normalize();
+
+                let moveX = 0, moveZ = 0;
+                if (keyState.w) { moveX += forward.x; moveZ += forward.z; }
+                if (keyState.s) { moveX -= forward.x; moveZ -= forward.z; }
+                if (keyState.a) { moveX -= right.x; moveZ -= right.z; }
+                if (keyState.d) { moveX += right.x; moveZ += right.z; }
+
+                if (moveX !== 0 || moveZ !== 0) {
+                    const len = Math.sqrt(moveX*moveX + moveZ*moveZ);
+                    moveX = (moveX / len) * speed;
+                    moveZ = (moveZ / len) * speed;
+                    let newX = camera.position.x + moveX;
+                    let newZ = camera.position.z + moveZ;
+                    // Коллизии со стенами
+                    newX = Math.min(wallMaxX-0.3, Math.max(wallMinX+0.3, newX));
+                    newZ = Math.min(wallMaxZ-0.3, Math.max(wallMinZ+0.3, newZ));
+                    camera.position.x = newX;
+                    camera.position.z = newZ;
+
+                    // Обновить позицию фонарика
+                    flashlight.position.copy(camera.position);
+                    flashlight.position.y = 1.4;
+                    const target = new THREE.Vector3(0, 0, -5);
+                    target.applyQuaternion(camera.quaternion);
+                    target.add(camera.position);
+                    flashlight.target.position.copy(target);
+                }
+
+                // Проверка коллизий с врагами и выходом
+                checkEnemyCollision();
+                checkExit();
+                updateEnemies();
+                updateUI();
+            }
+
+            // Анимация врагов (лёгкое покачивание)
+            const time = Date.now() * 0.002;
+            enemies.forEach((e, i) => {
+                e.mesh.position.y = Math.sin(time + i) * 0.03;
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        // --- Обработка изменения размера окна ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- Старт ---
+        resetGame();
+        animate();
+
+        // Небольшое предупреждение для мобильных
+        console.log('Управление: WASD + мышь. Кликните по окну для блокировки курсора.');
+    </script>
 </body>
 </html>
