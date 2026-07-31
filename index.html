@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кликер · NFT прокачка</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0b0d10;
+      padding: 16px;
+      position: relative;
+      isolation: isolate;
+    }
+
+    /* анимированный фон */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(135deg, #14181c 0%, #1f2a30 40%, #16222b 70%, #0f171f 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 0%; }
+      50% { background-position: 100% 60%; }
+      100% { background-position: 30% 100%; }
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 25%, rgba(255, 215, 140, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 85% 70%, rgba(180, 210, 240, 0.07) 0%, transparent 40%),
+        radial-gradient(circle at 40% 80%, rgba(200, 180, 250, 0.06) 0%, transparent 45%);
+      animation: floatOrbs 22s infinite alternate ease-in-out;
+    }
+
+    @keyframes floatOrbs {
+      0% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+      100% { transform: scale(1.2) rotate(8deg); opacity: 1; }
+    }
+
+    .card {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(22, 28, 34, 0.72);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 48px;
+      padding: 32px 28px 38px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      color: #eaeef2;
+      text-align: center;
+    }
+
+    .title {
+      font-weight: 400;
+      font-size: 1.8rem;
+      letter-spacing: -0.02em;
+      color: #d6dee6;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .title span {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 18px 4px;
+      border-radius: 100px;
+      font-weight: 300;
+      font-size: 1.2rem;
+      color: #aab9cd;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* клик-зона */
+    .tap-area {
+      position: relative;
+      margin: 16px 0 12px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 0.12s ease;
+    }
+    .tap-area:active { transform: scale(0.94); }
+
+    .dog-silhouette {
+      width: 150px;
+      height: 150px;
+      margin: 0 auto;
+      background: radial-gradient(circle at 30% 30%, #eceef2, #c8d2de);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      font-weight: 200;
+      color: #1f262e;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 -4px 0 rgba(0,0,0,0.1);
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      will-change: transform;
+      font-family: 'Times New Roman', serif;
+    }
+    .dog-silhouette::before {
+      content: "ᐠ•ᴥ•ᐟ";
+      font-size: 3.6rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      opacity: 0.95;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      transition: transform 0.2s;
+    }
+    .tap-area:active .dog-silhouette::before { transform: scale(0.92); }
+    .dog-silhouette.bounce {
+      animation: bounceDog 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes bounceDog {
+      0% { transform: scale(1) rotate(0deg); }
+      35% { transform: scale(1.18) rotate(-4deg); }
+      65% { transform: scale(0.92) rotate(3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .float-text {
+      position: absolute;
+      pointer-events: none;
+      font-weight: 500;
+      font-size: 2.4rem;
+      color: #d4dce8;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 20px rgba(200, 220, 255, 0.15);
+      animation: floatUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      z-index: 20;
+      letter-spacing: -0.02em;
+      padding: 0 8px;
+    }
+    @keyframes floatUp {
+      0% { opacity: 0.9; transform: translateY(0) scale(0.8); }
+      100% { opacity: 0; transform: translateY(-110px) scale(1.2); }
+    }
+
+    /* статистика */
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(4px);
+      padding: 12px 20px;
+      border-radius: 80px;
+      margin: 14px 0 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .stats .label { font-weight: 400; font-size: 1rem; color: #b2c2d4; letter-spacing: 0.3px; }
+    .stats .score {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 4px 18px;
+      border-radius: 60px;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: #eaf0f7;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      min-width: 60px;
+    }
+    .stats .coins {
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      padding: 4px 18px;
+      border-radius: 60px;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: #f5e56b;
+    }
+
+    /* прогресс-бар */
+    .progress-track {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 40px;
+      height: 5px;
+      margin: 2px 0 18px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #b7cadb, #d0dce8, #bdcfdf);
+      border-radius: 40px;
+      transition: width 0.12s ease-out;
+    }
+
+    /* улучшения */
+    .upgrades-section {
+      margin: 18px 0 16px;
+      text-align: left;
+    }
+    .upgrades-section h3 {
+      font-weight: 400;
+      font-size: 0.9rem;
+      letter-spacing: 0.6px;
+      color: #8fa2b9;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .upgrade-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 10px 16px 10px 20px;
+      border-radius: 60px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: background 0.2s;
+    }
+    .upgrade-row:hover { background: rgba(255, 255, 255, 0.04); }
+    .upgrade-info { display: flex; flex-direction: column; align-items: flex-start; }
+    .upgrade-name { font-weight: 400; font-size: 1rem; color: #d6e0ec; }
+    .upgrade-desc { font-size: 0.75rem; color: #889bb3; letter-spacing: 0.2px; }
+    .upgrade-price {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: #f5e56b;
+      background: rgba(0,0,0,0.2);
+      padding: 4px 14px 4px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+    .upgrade-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #d2dce8;
+      padding: 6px 18px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.15s;
+      font-weight: 400;
+      letter-spacing: 0.4px;
+      margin-left: 10px;
+    }
+    .upgrade-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.12); }
+    .upgrade-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
+    /* NFT секция */
+    .nft-section {
+      margin: 18px 0 12px;
+      text-align: left;
+    }
+    .nft-section h3 {
+      font-weight: 400;
+      font-size: 0.9rem;
+      letter-spacing: 0.6px;
+      color: #8fa2b9;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .nft-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .nft-card {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 20px;
+      padding: 14px 8px 12px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .nft-card.owned {
+      border-color: rgba(212, 175, 55, 0.25);
+      background: rgba(212, 175, 55, 0.06);
+    }
+    .nft-icon {
+      font-size: 2.2rem;
+      line-height: 1.2;
+      filter: grayscale(0.2);
+    }
+    .nft-name {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #c8d4e2;
+      margin: 4px 0 2px;
+    }
+    .nft-bonus {
+      font-size: 0.7rem;
+      color: #a5b9ce;
+      opacity: 0.7;
+    }
+    .nft-price {
+      font-size: 0.8rem;
+      color: #f5e56b;
+      margin: 6px 0 4px;
+      background: rgba(0,0,0,0.2);
+      padding: 2px 10px;
+      border-radius: 30px;
+      display: inline-block;
+    }
+    .nft-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #d2dce8;
+      padding: 4px 14px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: 0.15s;
+      margin-top: 4px;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+    .nft-btn:active { transform: scale(0.94); background: rgba(255,255,255,0.12); }
+    .nft-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+    .nft-card .owned-badge {
+      font-size: 0.65rem;
+      color: #f5e56b;
+      background: rgba(212, 175, 55, 0.15);
+      padding: 2px 12px;
+      border-radius: 30px;
+      display: inline-block;
+      margin-top: 4px;
+      border: 1px solid rgba(212, 175, 55, 0.15);
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      color: #6f829b;
+      font-weight: 300;
+      font-size: 0.8rem;
+      letter-spacing: 0.4px;
+      opacity: 0.4;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      padding-top: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 20px 16px 28px; border-radius: 32px; }
+      .dog-silhouette { width: 110px; height: 110px; }
+      .dog-silhouette::before { font-size: 2.6rem; }
+      .title { font-size: 1.5rem; }
+      .stats .score { font-size: 1.4rem; padding: 2px 12px; }
+      .stats .coins { font-size: 1.3rem; padding: 2px 12px; }
+      .nft-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .upgrade-row { flex-wrap: wrap; gap: 6px; }
+      .upgrade-btn { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="title">
+    кликер <span>·</span>
+  </div>
+
+  <div class="tap-area" id="tapArea">
+    <div class="dog-silhouette" id="dogSilhouette"></div>
+  </div>
+
+  <div class="stats">
+    <span class="label">очки</span>
+    <span class="score" id="scoreDisplay">0</span>
+    <span class="label">🪙</span>
+    <span class="coins" id="coinsDisplay">0</span>
+  </div>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+  </div>
+
+  <!-- Улучшения -->
+  <div class="upgrades-section">
+    <h3>⚡ улучшения</h3>
+    <div id="upgradesContainer"></div>
+  </div>
+
+  <!-- NFT -->
+  <div class="nft-section">
+    <h3>🖼️ NFT · коллекция</h3>
+    <div class="nft-grid" id="nftGrid"></div>
+  </div>
+
+  <div class="footer-note">клик · собирай · прокачивай</div>
+</div>
+
+<script>
+  (function() {
+    'use strict';
+
+    // --- состояние ---
+    let state = {
+      score: 0,           // очки (валюта для покупок)
+      coins: 0,           // монеты (накапливаются отдельно)
+      clickPower: 1,      // базовый доход за клик
+      passiveIncome: 0,   // пассивный доход (пока не используется, но можно расширить)
+      upgrades: {
+        // каждый апгрейд: { level, baseCost, costMultiplier, bonusPerLevel, maxLevel, name, desc }
+        click: { level: 0, baseCost: 10, costMultiplier: 1.5, bonusPerLevel: 1, maxLevel: 10, name: 'мощность клика', desc: '+1 к силе' },
+        coin: { level: 0, baseCost: 15, costMultiplier: 1.6, bonusPerLevel: 1, maxLevel: 8, name: 'монетный бонус', desc: '+1 монета за клик' },
+      },
+      nfts: [
+        { id: 'nft1', name: 'кибер-пёс', bonus: 2, cost: 30, icon: '🔮', owned: false },
+        { id: 'nft2', name: 'лунный волк', bonus: 4, cost: 60, icon: '🌙', owned: false },
+        { id: 'nft3', name: 'золотой дракон', bonus: 8, cost: 120, icon: '🐉', owned: false },
+        { id: 'nft4', name: 'космический лис', bonus: 15, cost: 250, icon: '🚀', owned: false },
+      ]
+    };
+
+    // --- DOM ---
+    const tapArea = document.getElementById('tapArea');
+    const dog = document.getElementById('dogSilhouette');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const coinsDisplay = document.getElementById('coinsDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const upgradesContainer = document.getElementById('upgradesContainer');
+    const nftGrid = document.getElementById('nftGrid');
+
+    // --- helper: обновить UI ---
+    function updateUI() {
+      scoreDisplay.textContent = state.score;
+      coinsDisplay.textContent = state.coins;
+      // прогресс (до 50 очков за 100%)
+      let progress = Math.min(state.score, 50);
+      let percent = (progress / 50) * 100;
+      progressFill.style.width = percent + '%';
+      if (state.score > 50) progressFill.style.width = '100%';
+    }
+
+    // --- helper: пересчитать бонусы от NFT ---
+    function getNFTBonus() {
+      let bonus = 0;
+      state.nfts.forEach(n => { if (n.owned) bonus += n.bonus; });
+      return bonus;
+    }
+
+    // --- helper: получить общую силу клика ---
+    function getClickPower() {
+      const upgradeBonus = state.upgrades.click.level * state.upgrades.click.bonusPerLevel;
+      const nftBonus = getNFTBonus();
+      return 1 + upgradeBonus + nftBonus; // базовая 1 + улучшения + NFT
+    }
+
+    // --- helper: получить монеты за клик ---
+    function getCoinPerClick() {
+      const coinBonus = state.upgrades.coin.level * state.upgrades.coin.bonusPerLevel;
+      return 1 + coinBonus; // всегда минимум 1 монета
+    }
+
+    // --- обработка клика ---
+    function handleTap(event) {
+      const power = getClickPower();
+      const coinsEarn = getCoinPerClick();
+
+      state.score += power;
+      state.coins += coinsEarn;
+
+      updateUI();
+      bounceDog();
+
+      let clientX, clientY;
+      if (event && event.clientX !== undefined && event.clientY !== undefined) {
+        clientX = event.clientX;
+        clientY = event.clientY;
+      } else if (event && event.touches && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      } else {
+        const rect = tapArea.getBoundingClientRect();
+        clientX = rect.left + rect.width / 2;
+        clientY = rect.top + rect.height / 2;
+      }
+      spawnFloat(clientX, clientY, `+${power} 🪙+${coinsEarn}`);
+
+      if (navigator.vibrate) navigator.vibrate(8);
+      if (event && event.cancelable) event.preventDefault();
+
+      // обновить кнопки (цены могли измениться)
+      renderUpgrades();
+      renderNFTs();
+    }
+
+    // --- анимации ---
+    function bounceDog() {
+      dog.classList.remove('bounce');
+      void dog.offsetWidth;
+      dog.classList.add('bounce');
+      setTimeout(() => dog.classList.remove('bounce'), 450);
+    }
+
+    function spawnFloat(x, y, text) {
+      const el = document.createElement('div');
+      el.className = 'float-text';
+      el.textContent = text;
+      const rect = tapArea.getBoundingClientRect();
+      let left = 50, top = 30;
+      if (x !== undefined && y !== undefined) {
+        const relX = ((x - rect.left) / rect.width) * 100;
+        const relY = ((y - rect.top) / rect.height) * 100;
+        left = Math.min(85, Math.max(15, relX));
+        top = Math.min(70, Math.max(10, relY));
+      }
+      el.style.left = left + '%';
+      el.style.top = top + '%';
+      el.style.transform = 'translate(-50%, -50%)';
+      tapArea.appendChild(el);
+      setTimeout(() => { if (el.parentNode) el.remove(); }, 950);
+    }
+
+    // --- рендер улучшений ---
+    function renderUpgrades() {
+      const clickUpg = state.upgrades.click;
+      const coinUpg = state.upgrades.coin;
+
+      const clickCost = Math.floor(clickUpg.baseCost * Math.pow(clickUpg.costMultiplier, clickUpg.level));
+      const coinCost = Math.floor(coinUpg.baseCost * Math.pow(coinUpg.costMultiplier, coinUpg.level));
+
+      const clickMaxed = clickUpg.level >= clickUpg.maxLevel;
+      const coinMaxed = coinUpg.level >= coinUpg.maxLevel;
+
+      upgradesContainer.innerHTML = `
+        <div class="upgrade-row">
+          <div class="upgrade-info">
+            <span class="upgrade-name">⚡ ${clickUpg.name}</span>
+            <span class="upgrade-desc">ур. ${clickUpg.level}/${clickUpg.maxLevel} · +${clickUpg.bonusPerLevel} сила</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="upgrade-price">🪙 ${clickMaxed ? 'MAX' : clickCost}</span>
+            <button class="upgrade-btn" id="upgradeClickBtn" ${clickMaxed ? 'disabled' : ''}>
+              ${clickMaxed ? 'макс' : 'купить'}
+            </button>
+          </div>
+        </div>
+        <div class="upgrade-row">
+          <div class="upgrade-info">
+            <span class="upgrade-name">🪙 ${coinUpg.name}</span>
+            <span class="upgrade-desc">ур. ${coinUpg.level}/${coinUpg.maxLevel} · +${coinUpg.bonusPerLevel} монет</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="upgrade-price">🪙 ${coinMaxed ? 'MAX' : coinCost}</span>
+            <button class="upgrade-btn" id="upgradeCoinBtn" ${coinMaxed ? 'disabled' : ''}>
+              ${coinMaxed ? 'макс' : 'купить'}
+            </button>
+          </div>
+        </div>
+      `;
+
+      // обработчики
+      document.getElementById('upgradeClickBtn')?.addEventListener('click', () => buyUpgrade('click'));
+      document.getElementById('upgradeCoinBtn')?.addEventListener('click', () => buyUpgrade('coin'));
+    }
+
+    // --- покупка улучшения ---
+    function buyUpgrade(type) {
+      const upg = state.upgrades[type];
+      if (upg.level >= upg.maxLevel) return;
+      const cost = Math.floor(upg.baseCost * Math.pow(upg.costMultiplier, upg.level));
+      if (state.coins < cost) return;
+
+      state.coins -= cost;
+      upg.level += 1;
+      updateUI();
+      renderUpgrades();
+      renderNFTs();
+    }
+
+    // --- рендер NFT ---
+    function renderNFTs() {
+      nftGrid.innerHTML = '';
+      state.nfts.forEach(nft => {
+        const card = document.createElement('div');
+        card.className = `nft-card ${nft.owned ? 'owned' : ''}`;
+        card.innerHTML = `
+          <div class="nft-icon">${nft.icon}</div>
+          <div class="nft-name">${nft.name}</div>
+          <div class="nft-bonus">+${nft.bonus} сила</div>
+          ${nft.owned
+            ? `<div class="owned-badge">✅ владение</div>`
+            : `<div class="nft-price">🪙 ${nft.cost}</div>
+               <button class="nft-btn" data-id="${nft.id}">купить</button>`
+          }
+        `;
+        nftGrid.appendChild(card);
+      });
+
+      // обработчики покупки NFT
+      document.querySelectorAll('.nft-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          buyNFT(id);
+        });
+      });
+    }
+
+    // --- покупка NFT ---
+    function buyNFT(id) {
+      const nft = state.nfts.find(n => n.id === id);
+      if (!nft || nft.owned) return;
+      if (state.coins < nft.cost) return;
+
+      state.coins -= nft.cost;
+      nft.owned = true;
+      updateUI();
+      renderNFTs();
+      renderUpgrades();
+      // показать всплывашку
+      const rect = tapArea.getBoundingClientRect();
+      spawnFloat(rect.left + rect.width/2, rect.top + rect.height/2, `NFT получен! +${nft.bonus}`);
+    }
+
+    // --- инициализация ---
+    function init() {
+      updateUI();
+      renderUpgrades();
+      renderNFTs();
+
+      tapArea.addEventListener('click', handleTap);
+      tapArea.addEventListener('touchstart', handleTap, { passive: false });
+
+      // доступность
+      tapArea.setAttribute('role', 'button');
+      tapArea.setAttribute('aria-label', 'кликни для заработка');
+    }
+
+    init();
+
+  })();
+</script>
+
+</body>
+</html>
