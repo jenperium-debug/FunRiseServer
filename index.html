@@ -3,661 +3,835 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Мессенджер</title>
+    <title>Русская рыбалка 4 точки</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #0a0a0a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #0f0c29;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Arial, sans-serif;
             min-height: 100vh;
+            padding: 20px;
         }
         
-        .container {
-            width: 420px;
-            max-width: 100%;
-            height: 750px;
-            max-height: 100vh;
-            background: #1a1a1a;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.9);
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(72, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(0, 255, 200, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: gradientShift 10s ease-in-out infinite alternate;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        h1 {
+            color: #00ffc8;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.8rem;
+            text-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
+            font-family: 'Georgia', serif;
+        }
+        
+        h1 i {
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 255, 200, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h3 {
+            color: #00ffc8;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .card h3 i { margin-right: 10px; }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin: 5px 0 12px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #00ffc8;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.1);
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #00ffc8, #00b894);
+            color: #0f0c29;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 255, 200, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #00ffc8;
+            color: #00ffc8;
+        }
+        
+        .btn-outline:hover {
+            background: #00ffc8;
+            color: #0f0c29;
+        }
+        
+        .btn-danger {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .btn-danger:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-group {
             display: flex;
-            flex-direction: column;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
-        .header {
-            padding: 20px 24px;
-            background: #222;
-            border-bottom: 1px solid #333;
+        .btn-group button { flex: 1; min-width: 100px; }
+        
+        .post {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .post:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 200, 0.1);
+        }
+        
+        .post .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        
-        .header h1 {
-            color: #fff;
-            font-size: 20px;
-            font-weight: 600;
-        }
-        
-        .header .user-info {
-            color: #888;
-            font-size: 13px;
-        }
-        
-        .btn-logout {
-            background: #c0392b;
-            color: #fff;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: 0.3s;
-        }
-        
-        .btn-logout:hover {
-            background: #e74c3c;
-        }
-        
-        .messages {
-            flex: 1;
-            padding: 16px 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            background: #111;
-        }
-        
-        .messages .empty {
-            color: #555;
-            text-align: center;
-            margin-top: 40px;
-            font-size: 14px;
-        }
-        
-        .msg {
-            max-width: 80%;
-            padding: 10px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            word-wrap: break-word;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        .msg.me {
-            align-self: flex-end;
-            background: #0a84ff;
-            color: #fff;
-            border-bottom-right-radius: 4px;
-        }
-        
-        .msg.friend {
-            align-self: flex-start;
-            background: #2c2c2c;
-            color: #eee;
-            border-bottom-left-radius: 4px;
-        }
-        
-        .msg .time {
-            font-size: 10px;
-            opacity: 0.5;
-            margin-top: 4px;
-            display: block;
-        }
-        
-        .msg .sender {
-            font-size: 11px;
-            font-weight: 600;
-            color: #0a84ff;
-            display: block;
-            margin-bottom: 2px;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .input-area {
-            padding: 12px 16px 16px;
-            background: #1a1a1a;
-            border-top: 1px solid #2a2a2a;
-            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            align-items: end;
         }
         
-        .input-area textarea {
-            flex: 1;
-            padding: 10px 14px;
+        .post .nick {
+            color: #00ffc8;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        
+        .post .map {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 12px;
             border-radius: 20px;
-            border: 1px solid #333;
-            background: #111;
-            color: #fff;
-            font-size: 14px;
-            resize: none;
-            outline: none;
-            max-height: 80px;
-            min-height: 44px;
-            transition: 0.3s;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
         }
         
-        .input-area textarea:focus {
-            border-color: #0a84ff;
-        }
-        
-        .input-area textarea::placeholder {
-            color: #555;
-        }
-        
-        .btn-send {
-            background: #0a84ff;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            height: 44px;
-            white-space: nowrap;
-        }
-        
-        .btn-send:hover {
-            background: #0066cc;
-        }
-        
-        .btn-send:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        
-        .auth-form {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 40px 30px;
-            gap: 16px;
-        }
-        
-        .auth-form h2 {
-            color: #fff;
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
-        .auth-form input {
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            background: #111;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: 0.3s;
-        }
-        
-        .auth-form input:focus {
-            border-color: #0a84ff;
-        }
-        
-        .auth-form input::placeholder {
-            color: #555;
-        }
-        
-        .auth-form .btn-auth {
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            background: #0a84ff;
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+        .post .date {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
             margin-top: 8px;
         }
         
-        .auth-form .btn-auth:hover {
-            background: #0066cc;
+        .post img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        .auth-form .switch {
-            color: #888;
-            text-align: center;
-            font-size: 14px;
+        .post .text {
+            margin-top: 8px;
+            line-height: 1.5;
         }
         
-        .auth-form .switch a {
-            color: #0a84ff;
-            cursor: pointer;
-            text-decoration: none;
+        .status-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s ease-in-out infinite;
         }
         
-        .auth-form .switch a:hover {
-            text-decoration: underline;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         
-        .auth-form .error {
-            color: #e74c3c;
-            font-size: 13px;
-            text-align: center;
-            min-height: 20px;
-        }
+        .online { background: #00ffc8; box-shadow: 0 0 20px rgba(0, 255, 200, 0.4); }
+        .offline { background: #ff6b6b; }
         
-        .auth-form .debug {
-            color: #666;
+        .role-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
             font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+        
+        .role-badge.admin {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+        
+        .role-badge.moderator {
+            background: rgba(255, 217, 61, 0.2);
+            color: #ffd93d;
+            border: 1px solid #ffd93d;
+        }
+        
+        .role-badge.user {
+            background: rgba(0, 255, 200, 0.2);
+            color: #00ffc8;
+            border: 1px solid #00ffc8;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-top: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-success {
+            background: rgba(0, 255, 200, 0.1);
+            color: #00ffc8;
+            border: 1px solid rgba(0, 255, 200, 0.2);
+        }
+        
+        .alert-danger {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        
+        .alert-warning {
+            background: rgba(255, 217, 61, 0.1);
+            color: #ffd93d;
+            border: 1px solid rgba(255, 217, 61, 0.2);
+        }
+        
+        .alert-info {
+            background: rgba(0, 255, 200, 0.05);
+            color: #00ffc8;
+            border: 1px solid rgba(0, 255, 200, 0.1);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            margin: 5px 0 12px 0;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper .file-label {
+            display: block;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             text-align: center;
-            word-break: break-all;
-            background: #0a0a0a;
-            padding: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .file-input-wrapper .file-label:hover {
+            border-color: #00ffc8;
+            background: rgba(0, 255, 200, 0.05);
+        }
+        
+        .file-input-wrapper .file-label i {
+            font-style: normal;
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .image-preview {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-preview .remove-image {
+            display: inline-block;
+            margin-top: 5px;
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+            padding: 4px 12px;
             border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
         }
         
-        .hidden {
-            display: none !important;
+        .image-preview .remove-image:hover {
+            background: rgba(255, 107, 107, 0.3);
         }
         
-        .call-buttons {
-            display: flex;
-            gap: 8px;
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.3);
         }
         
-        .btn-call {
-            background: #27ae60;
-            color: #fff;
-            border: none;
+        .empty-state i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+        }
+        
+        .map-badge {
+            display: inline-block;
             padding: 6px 14px;
+            margin: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map-badge:hover {
+            border-color: #00ffc8;
+            background: rgba(0, 255, 200, 0.05);
+        }
+        
+        .map-badge.active {
+            background: linear-gradient(135deg, #00ffc8, #00b894);
+            color: #0f0c29;
+            border-color: #00ffc8;
+        }
+        
+        #mapContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .slider-range {
+            width: 100%;
+            accent-color: #00ffc8;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 6px;
+        }
+        
+        .slider-range::-webkit-slider-thumb {
+            background: #00ffc8;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.3);
+        }
+        
+        .delete-btn {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            padding: 4px 10px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 12px;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
         
-        .btn-call:hover {
-            background: #2ecc71;
+        .delete-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
         }
         
-        .btn-call.end {
-            background: #c0392b;
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .card { padding: 18px; }
+            .btn-group { flex-direction: column; }
+            .btn-group button { width: 100%; }
         }
         
-        .btn-call.end:hover {
-            background: #e74c3c;
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.6rem; }
+            .card { padding: 15px; }
         }
         
-        .status {
-            color: #888;
-            font-size: 12px;
-            text-align: center;
-            padding: 4px;
-        }
-        
-        .messages::-webkit-scrollbar {
-            width: 4px;
-        }
-        .messages::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-        .messages::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
+        /* Скрытые элементы */
+        #registerCard { display: none; }
+        #adminContent { display: none; }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🎣 Русская рыбалка 4 точки</h1>
 
-<div class="container" id="app">
-    <div class="header" id="header" style="display:none;">
-        <div>
-            <h1>💬 Мессенджер</h1>
-            <div class="user-info" id="userDisplay">Пользователь</div>
+        <!-- Статус -->
+        <div class="card">
+            <span class="status-dot offline" id="statusDot"></span>
+            <span id="statusText">Не авторизован</span>
+            <span id="userRole" style="display:none;"></span>
         </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-            <button class="btn-call" id="callBtn" onclick="makeCall()">📞 Позвонить</button>
-            <button class="btn-logout" onclick="logout()">Выйти</button>
+
+        <!-- Вход -->
+        <div class="card" id="loginCard">
+            <h3>🔑 Вход</h3>
+            <input type="text" id="loginInput" placeholder="Логин" value="smetana123">
+            <input type="password" id="passwordInput" placeholder="Пароль" value="123456">
+            <div class="btn-group">
+                <button id="loginBtn">Войти</button>
+                <button id="registerBtn" class="btn-outline">Регистрация</button>
+            </div>
+            <div id="authStatus"></div>
+        </div>
+
+        <!-- Регистрация -->
+        <div class="card" id="registerCard">
+            <h3>📝 Регистрация</h3>
+            <input type="text" id="regLoginInput" placeholder="Логин">
+            <input type="password" id="regPasswordInput" placeholder="Пароль">
+            <input type="text" id="regNickInput" placeholder="Никнейм (опционально)">
+            <div class="btn-group">
+                <button id="regSubmitBtn">Зарегистрироваться</button>
+                <button id="regCancelBtn" class="btn-danger">Отмена</button>
+            </div>
+            <div id="regStatus"></div>
+        </div>
+
+        <!-- Карты -->
+        <div class="card">
+            <h3>🗺️ Выбор карты</h3>
+            <label style="color:rgba(255,255,255,0.6);font-size:14px;">Ползунок карт</label>
+            <input type="range" id="mapSlider" class="slider-range" min="0" max="17" value="0" step="1">
+            <div id="mapContainer"></div>
+            <div style="margin-top:10px;">
+                <span id="selectedMapDisplay" style="color:#00ffc8;font-weight:bold;">Комариное</span>
+            </div>
+        </div>
+
+        <!-- Новый пост -->
+        <div class="card">
+            <h3>✏️ Новый пост</h3>
+            <textarea id="postContent" rows="3" placeholder="Что поймали? Расскажите..."></textarea>
+            <div class="file-input-wrapper">
+                <div class="file-label">
+                    <i>📸</i>
+                    Нажмите для загрузки фото
+                    <input type="file" id="postImageInput" accept="image/*">
+                </div>
+            </div>
+            <div class="image-preview" id="imagePreviewContainer">
+                <img id="imagePreview" src="#" alt="Предпросмотр">
+                <span class="remove-image" id="removeImageBtn">✕ Удалить</span>
+            </div>
+            <button id="publishBtn" style="width:100%;margin-top:10px;">📤 Опубликовать</button>
+            <div id="publishStatus"></div>
+        </div>
+
+        <!-- Лента -->
+        <div class="card">
+            <h3>📰 Лента</h3>
+            <button id="refreshBtn" style="width:100%;margin-bottom:15px;">🔄 Обновить</button>
+            <div id="feedContainer">
+                <div class="empty-state">
+                    <i>🎣</i>
+                    Загрузка...
+                </div>
+            </div>
         </div>
     </div>
-    
-    <div class="messages" id="messages">
-        <div class="empty">Авторизуйтесь, чтобы начать общение</div>
-    </div>
-    
-    <div class="status" id="callStatus"></div>
-    
-    <div class="input-area" id="inputArea" style="display:none;">
-        <textarea id="msgInput" rows="1" placeholder="Введите сообщение..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
-        <button class="btn-send" id="sendBtn" onclick="sendMessage()">Отправить</button>
-    </div>
-    
-    <div class="auth-form" id="authForm">
-        <h2 id="authTitle">Регистрация</h2>
-        <input type="text" id="authUsername" placeholder="Имя пользователя" autocomplete="username">
-        <input type="password" id="authPassword" placeholder="Пароль" autocomplete="current-password">
-        <div class="error" id="authError"></div>
-        <div class="debug" id="debugInfo">🔍 Проверка соединения...</div>
-        <button class="btn-auth" id="authBtn" onclick="auth()">Зарегистрироваться</button>
-        <div class="switch">
-            <span id="switchText">Уже есть аккаунт?</span>
-            <a id="switchLink" onclick="toggleAuth()">Войти</a>
-        </div>
-    </div>
-</div>
 
-<script>
-// ============ АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ API ============
-// Пытаемся найти api.php в текущей папке или родительской
-let API_URL = '';
-
-function detectApiUrl() {
-    const paths = [
-        window.location.pathname.replace(/\/[^/]*$/, '/') + 'api.php',
-        window.location.pathname.replace(/\/[^/]*$/, '/') + '../api.php',
-        '/api.php',
-        'api.php'
-    ];
-    
-    // Используем текущий URL как базовый
-    const base = window.location.origin;
-    
-    // Пробуем разные пути
-    for (let p of paths) {
-        const testUrl = base + p;
-        // Проверяем через fetch
-        fetch(testUrl, { method: 'HEAD' })
-            .then(() => {
-                API_URL = testUrl;
-                document.getElementById('debugInfo').textContent = '✅ Сервер найден: ' + API_URL;
-                document.getElementById('debugInfo').style.color = '#2ecc71';
-            })
-            .catch(() => {
-                // Пробуем следующий
-            });
-    }
-    
-    // Если ничего не нашлось, используем относительный путь
-    setTimeout(() => {
-        if (!API_URL) {
-            API_URL = window.location.href.replace(/\/[^/]*$/, '/') + 'api.php';
-            document.getElementById('debugInfo').textContent = '⚠️ Используем: ' + API_URL;
-            document.getElementById('debugInfo').style.color = '#f39c12';
-        }
-    }, 1000);
-}
-
-// Запускаем поиск
-detectApiUrl();
-
-// ============ СОСТОЯНИЕ ============
-let currentUser = null;
-let isLogin = false; // по умолчанию регистрация
-let pollInterval = null;
-let callActive = false;
-let peerConnection = null;
-let localStream = null;
-
-// ============ АВТОРИЗАЦИЯ ============
-function toggleAuth() {
-    isLogin = !isLogin;
-    document.getElementById('authTitle').textContent = isLogin ? 'Вход' : 'Регистрация';
-    document.getElementById('authBtn').textContent = isLogin ? 'Войти' : 'Зарегистрироваться';
-    document.getElementById('switchText').textContent = isLogin ? 'Нет аккаунта?' : 'Уже есть аккаунт?';
-    document.getElementById('switchLink').textContent = isLogin ? 'Зарегистрироваться' : 'Войти';
-    document.getElementById('authError').textContent = '';
-}
-
-async function auth() {
-    const username = document.getElementById('authUsername').value.trim();
-    const password = document.getElementById('authPassword').value.trim();
-    const errorEl = document.getElementById('authError');
-    const debugEl = document.getElementById('debugInfo');
-    
-    if (!username || !password) {
-        errorEl.textContent = 'Заполните все поля';
-        return;
-    }
-    
-    if (!API_URL) {
-        errorEl.textContent = '❌ Не удалось найти сервер. Проверьте, что api.php загружен на хостинг!';
-        return;
-    }
-    
-    const action = isLogin ? 'login' : 'register';
-    debugEl.textContent = '🔄 Отправка запроса к ' + API_URL + '...';
-    debugEl.style.color = '#f39c12';
-    
-    try {
-        const resp = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, username, password })
-        });
+    <script>
+        // ---------- КАРТЫ ----------
+        const MAPS = [
+            "Комариное", "Лосиное", "Вьюнок", "Старый острог", "Белая", 
+            "Куори", "Медвежка", "Волхов", "Северский донец", "Сура", 
+            "Янтарное", "Ладожское", "Ладожский архипелаг", "Ахтуба", 
+            "Медное", "Нижняя тунгуска", "Яма", "Норвежское море"
+        ];
         
-        const data = await resp.json();
-        debugEl.textContent = '📡 Ответ: ' + JSON.stringify(data);
-        debugEl.style.color = '#888';
-        
-        if (data.success) {
-            currentUser = username;
-            document.getElementById('authForm').classList.add('hidden');
-            document.getElementById('header').style.display = 'flex';
-            document.getElementById('inputArea').style.display = 'flex';
-            document.getElementById('userDisplay').textContent = '👤 ' + username;
-            document.getElementById('messages').innerHTML = '<div class="empty">Добро пожаловать! Начинайте общение.</div>';
-            errorEl.textContent = '';
-            debugEl.textContent = '✅ Авторизован как ' + username;
-            debugEl.style.color = '#2ecc71';
-            
-            loadMessages();
-            if (pollInterval) clearInterval(pollInterval);
-            pollInterval = setInterval(loadMessages, 2000);
-        } else {
-            errorEl.textContent = data.error || 'Ошибка';
-            debugEl.textContent = '❌ ' + (data.error || 'Неизвестная ошибка');
-            debugEl.style.color = '#e74c3c';
-        }
-    } catch (e) {
-        errorEl.textContent = '❌ Ошибка соединения с сервером';
-        debugEl.textContent = '❌ Ошибка: ' + e.message + ' (URL: ' + API_URL + ')';
-        debugEl.style.color = '#e74c3c';
-        console.error('Ошибка:', e);
-    }
-}
+        let selectedMap = MAPS[0];
+        let posts = [];
+        let currentUser = null;
+        let selectedImageData = null;
 
-function logout() {
-    currentUser = null;
-    if (pollInterval) clearInterval(pollInterval);
-    if (peerConnection) peerConnection.close();
-    if (localStream) localStream.getTracks().forEach(t => t.stop());
-    callActive = false;
-    document.getElementById('callStatus').textContent = '';
-    document.getElementById('authForm').classList.remove('hidden');
-    document.getElementById('header').style.display = 'none';
-    document.getElementById('inputArea').style.display = 'none';
-    document.getElementById('messages').innerHTML = '<div class="empty">Авторизуйтесь, чтобы начать общение</div>';
-    document.getElementById('authPassword').value = '';
-    document.getElementById('authError').textContent = '';
-    isLogin = false;
-    document.getElementById('authTitle').textContent = 'Регистрация';
-    document.getElementById('authBtn').textContent = 'Зарегистрироваться';
-    document.getElementById('switchText').textContent = 'Уже есть аккаунт?';
-    document.getElementById('switchLink').textContent = 'Войти';
-}
-
-// ============ СООБЩЕНИЯ ============
-async function sendMessage() {
-    const input = document.getElementById('msgInput');
-    const text = input.value.trim();
-    if (!text || !currentUser) return;
-    
-    input.value = '';
-    input.style.height = 'auto';
-    
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'send',
-                username: currentUser,
-                message: text
-            })
-        });
-        loadMessages();
-    } catch (e) {
-        console.error('Ошибка отправки:', e);
-    }
-}
-
-async function loadMessages() {
-    if (!currentUser) return;
-    
-    try {
-        const resp = await fetch(API_URL + '?action=get&user=' + encodeURIComponent(currentUser));
-        const data = await resp.json();
-        
-        if (data.success && data.messages) {
-            const container = document.getElementById('messages');
+        // Рендер карт
+        function renderMaps() {
+            const container = document.getElementById('mapContainer');
             container.innerHTML = '';
+            MAPS.forEach((mapName, index) => {
+                const badge = document.createElement('span');
+                badge.className = `map-badge ${mapName === selectedMap ? 'active' : ''}`;
+                badge.textContent = mapName;
+                badge.addEventListener('click', () => selectMapByIndex(index));
+                container.appendChild(badge);
+            });
+            const idx = MAPS.indexOf(selectedMap);
+            document.getElementById('mapSlider').value = idx >= 0 ? idx : 0;
+            document.getElementById('selectedMapDisplay').textContent = selectedMap;
+        }
+
+        function selectMapByIndex(index) {
+            if (index >= 0 && index < MAPS.length) {
+                selectedMap = MAPS[index];
+                document.querySelectorAll('.map-badge').forEach((el, i) => {
+                    el.classList.toggle('active', i === index);
+                });
+                document.getElementById('mapSlider').value = index;
+                document.getElementById('selectedMapDisplay').textContent = selectedMap;
+            }
+        }
+
+        document.getElementById('mapSlider').addEventListener('input', function() {
+            const idx = parseInt(this.value, 10);
+            if (!isNaN(idx) && idx >= 0 && idx < MAPS.length) {
+                selectedMap = MAPS[idx];
+                document.querySelectorAll('.map-badge').forEach((el, i) => {
+                    el.classList.toggle('active', i === idx);
+                });
+                document.getElementById('selectedMapDisplay').textContent = selectedMap;
+            }
+        });
+
+        // ---------- ВХОД ----------
+        async function login() {
+            const username = document.getElementById('loginInput').value.trim();
+            const password = document.getElementById('passwordInput').value.trim();
             
-            if (data.messages.length === 0) {
-                container.innerHTML = '<div class="empty">Нет сообщений. Напишите что-нибудь!</div>';
+            if (!username || !password) {
+                document.getElementById('authStatus').innerHTML = 
+                    '<div class="alert alert-warning">Введите логин и пароль</div>';
                 return;
             }
-            
-            data.messages.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = 'msg ' + (msg.username === currentUser ? 'me' : 'friend');
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
                 
-                if (msg.username !== currentUser) {
-                    const sender = document.createElement('span');
-                    sender.className = 'sender';
-                    sender.textContent = msg.username;
-                    div.appendChild(sender);
+                if (data.success) {
+                    currentUser = data.user;
+                    document.getElementById('statusDot').className = 'status-dot online';
+                    document.getElementById('statusText').textContent = currentUser.nick + ' (' + currentUser.role + ')';
+                    
+                    let roleBadge = document.getElementById('userRole');
+                    roleBadge.style.display = 'inline-block';
+                    roleBadge.className = 'role-badge ' + currentUser.role;
+                    roleBadge.textContent = currentUser.role.toUpperCase();
+                    
+                    document.getElementById('authStatus').innerHTML = 
+                        '<div class="alert alert-success">✅ Добро пожаловать, ' + currentUser.nick + '!</div>';
+                    
+                    document.getElementById('loginCard').style.display = 'none';
+                } else {
+                    document.getElementById('authStatus').innerHTML = 
+                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
                 }
-                
-                const text = document.createElement('span');
-                text.textContent = msg.message;
-                div.appendChild(text);
-                
-                const time = document.createElement('span');
-                time.className = 'time';
-                time.textContent = new Date(msg.created_at).toLocaleTimeString();
-                div.appendChild(time);
-                
-                container.appendChild(div);
-            });
-            
-            container.scrollTop = container.scrollHeight;
-        }
-    } catch (e) {
-        console.error('Ошибка загрузки:', e);
-    }
-}
-
-// ============ ЗВОНКИ ============
-async function makeCall() {
-    if (!currentUser) return;
-    
-    if (callActive) {
-        if (peerConnection) peerConnection.close();
-        if (localStream) localStream.getTracks().forEach(t => t.stop());
-        callActive = false;
-        document.getElementById('callStatus').textContent = 'Звонок завершён';
-        document.getElementById('callBtn').textContent = '📞 Позвонить';
-        document.getElementById('callBtn').className = 'btn-call';
-        return;
-    }
-    
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        
-        const config = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' }
-            ]
-        };
-        peerConnection = new RTCPeerConnection(config);
-        
-        localStream.getTracks().forEach(track => {
-            peerConnection.addTrack(track, localStream);
-        });
-        
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        
-        const resp = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'call',
-                username: currentUser,
-                offer: JSON.stringify(peerConnection.localDescription)
-            })
-        });
-        
-        const data = await resp.json();
-        if (data.success) {
-            callActive = true;
-            document.getElementById('callStatus').textContent = '📞 Идёт вызов... Ожидайте ответа';
-            document.getElementById('callBtn').textContent = '🔴 Завершить';
-            document.getElementById('callBtn').className = 'btn-call end';
-            waitForAnswer();
-        }
-    } catch (e) {
-        console.error('Ошибка звонка:', e);
-        alert('Не удалось начать звонок. Проверьте микрофон.');
-    }
-}
-
-async function waitForAnswer() {
-    const checkInterval = setInterval(async () => {
-        if (!callActive) {
-            clearInterval(checkInterval);
-            return;
-        }
-        
-        try {
-            const resp = await fetch(API_URL + '?action=check_call&user=' + encodeURIComponent(currentUser));
-            const data = await resp.json();
-            
-            if (data.success && data.answer) {
-                clearInterval(checkInterval);
-                const answer = JSON.parse(data.answer);
-                await peerConnection.setRemoteDescription(answer);
-                document.getElementById('callStatus').textContent = '📞 Соединение установлено!';
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = 
+                    '<div class="alert alert-danger">❌ Ошибка: ' + error.message + '</div>';
             }
-        } catch (e) {
-            console.error('Ошибка проверки ответа:', e);
         }
-    }, 2000);
-}
 
-// ============ АВТО-РАЗМЕР ============
-document.getElementById('msgInput').addEventListener('input', function() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 80) + 'px';
-});
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('loginInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') login(); });
+        document.getElementById('passwordInput').addEventListener('keyup', (e) => { if (e.key === 'Enter') login(); });
 
-// ============ ЗАПУСК ============
-console.log('📱 Мессенджер запущен');
-console.log('📍 Путь к странице:', window.location.href);
-console.log('⚠️ Убедитесь, что api.php загружен на хостинг в ту же папку!');
-</script>
+        // ---------- РЕГИСТРАЦИЯ ----------
+        document.getElementById('registerBtn').addEventListener('click', function() {
+            document.getElementById('registerCard').style.display = 'block';
+            document.getElementById('authStatus').innerHTML = '';
+        });
+
+        document.getElementById('regCancelBtn').addEventListener('click', function() {
+            document.getElementById('registerCard').style.display = 'none';
+            document.getElementById('regStatus').innerHTML = '';
+        });
+
+        document.getElementById('regSubmitBtn').addEventListener('click', async function() {
+            const username = document.getElementById('regLoginInput').value.trim();
+            const password = document.getElementById('regPasswordInput').value.trim();
+            const nick = document.getElementById('regNickInput').value.trim() || username;
+
+            if (!username || !password) {
+                document.getElementById('regStatus').innerHTML = 
+                    '<div class="alert alert-warning">Заполните логин и пароль</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, nick })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('regStatus').innerHTML = 
+                        '<div class="alert alert-success">✅ Регистрация успешна! Теперь войдите.</div>';
+                    document.getElementById('loginInput').value = username;
+                    document.getElementById('passwordInput').value = password;
+                    setTimeout(() => {
+                        document.getElementById('registerCard').style.display = 'none';
+                        document.getElementById('regStatus').innerHTML = '';
+                    }, 2000);
+                } else {
+                    document.getElementById('regStatus').innerHTML = 
+                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('regStatus').innerHTML = 
+                    '<div class="alert alert-danger">❌ ' + error.message + '</div>';
+            }
+        });
+
+        // ---------- РАБОТА С ИЗОБРАЖЕНИЯМИ ----------
+        document.getElementById('postImageInput').addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    selectedImageData = e.target.result;
+                    document.getElementById('imagePreview').src = selectedImageData;
+                    document.getElementById('imagePreviewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        document.getElementById('removeImageBtn').addEventListener('click', function() {
+            selectedImageData = null;
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('imagePreview').src = '#';
+            document.getElementById('postImageInput').value = '';
+        });
+
+        // ---------- ПОСТЫ ----------
+        async function fetchPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                const data = await response.json();
+                return data.success ? data.posts : [];
+            } catch {
+                return [];
+            }
+        }
+
+        async function renderFeed() {
+            const container = document.getElementById('feedContainer');
+            container.innerHTML = '<div class="empty-state"><i>⏳</i>Загрузка...</div>';
+            
+            const postsData = await fetchPosts();
+            
+            if (!postsData || postsData.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i>🎣</i>Пока нет постов. Будьте первым!</div>';
+                return;
+            }
+
+            let html = '';
+            postsData.slice().reverse().forEach(post => {
+                const roleClass = post.role || 'user';
+                const roleIcon = roleClass === 'admin' ? '👑' : roleClass === 'moderator' ? '🛡️' : '🎣';
+                const canDelete = currentUser && (currentUser.role === 'admin' || currentUser.nick === post.nick);
+                
+                html += `
+                    <div class="post">
+                        <div class="header">
+                            <div>
+                                <span class="nick">${post.nick}</span>
+                                <span class="role-badge ${roleClass}">${roleIcon} ${roleClass.toUpperCase()}</span>
+                                <span class="map">📍 ${post.map || 'Комариное'}</span>
+                            </div>
+                            ${canDelete ? `<span class="delete-btn" onclick="deletePost('${post.id}')">🗑️ Удалить</span>` : ''}
+                        </div>
+                        <div class="text">${post.text}</div>
+                        ${post.imageData ? `<img src="${post.imageData}" alt="Фото">` : ''}
+                        <div class="date">${post.created_at || ''}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        window.deletePost = async function(postId) {
+            if (!confirm('Удалить этот пост?')) return;
+            
+            try {
+                const response = await fetch(`/api/posts/${postId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: currentUser?.role || 'user', nick: currentUser?.nick || '' })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    renderFeed();
+                    document.getElementById('publishStatus').innerHTML = 
+                        '<div class="alert alert-success">✅ Пост удален</div>';
+                    setTimeout(() => {
+                        document.getElementById('publishStatus').innerHTML = '';
+                    }, 3000);
+                }
+            } catch (error) {
+                document.getElementById('publishStatus').innerHTML = 
+                    '<div class="alert alert-danger">❌ Ошибка удаления</div>';
+            }
+        };
+
+        document.getElementById('refreshBtn').addEventListener('click', renderFeed);
+
+        // ---------- ПУБЛИКАЦИЯ ПОСТА ----------
+        async function publishPost() {
+            if (!currentUser) {
+                document.getElementById('publishStatus').innerHTML = 
+                    '<div class="alert alert-warning">⚠️ Сначала войдите в систему!</div>';
+                return;
+            }
+
+            const text = document.getElementById('postContent').value.trim();
+
+            if (!text && !selectedImageData) {
+                document.getElementById('publishStatus').innerHTML = 
+                    '<div class="alert alert-warning">⚠️ Напишите текст или загрузите фото</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nick: currentUser.nick,
+                        role: currentUser.role,
+                        map: selectedMap,
+                        text: text || 'Без текста',
+                        imageData: selectedImageData
+                    })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('publishStatus').innerHTML = 
+                        '<div class="alert alert-success">✅ Пост опубликован!</div>';
+                    document.getElementById('postContent').value = '';
+                    document.getElementById('postImageInput').value = '';
+                    selectedImageData = null;
+                    document.getElementById('imagePreviewContainer').style.display = 'none';
+                    document.getElementById('imagePreview').src = '#';
+                    renderFeed();
+                    setTimeout(() => {
+                        document.getElementById('publishStatus').innerHTML = '';
+                    }, 3000);
+                } else {
+                    document.getElementById('publishStatus').innerHTML = 
+                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
+                }
+            } catch (error) {
+                document.getElementById('publishStatus').innerHTML = 
+                    '<div class="alert alert-danger">❌ ' + error.message + '</div>';
+            }
+        }
+
+        document.getElementById('publishBtn').addEventListener('click', publishPost);
+
+        // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+        renderMaps();
+        renderFeed();
+
+        // Автовход
+        setTimeout(() => {
+            if (!currentUser) login();
+        }, 500);
+
+        console.log('🎣 Русская рыбалка 4 точки загружена!');
+        console.log('🔑 Логин: smetana123, Пароль: 123456');
+    </script>
 </body>
 </html>
