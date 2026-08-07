@@ -278,12 +278,6 @@
             border: 1px solid rgba(255, 217, 61, 0.2);
         }
         
-        .alert-info {
-            background: rgba(0, 255, 200, 0.05);
-            color: #00ffc8;
-            border: 1px solid rgba(0, 255, 200, 0.1);
-        }
-        
         .file-input-wrapper {
             position: relative;
             overflow: hidden;
@@ -428,7 +422,6 @@
             background: rgba(255, 107, 107, 0.2);
         }
         
-        /* Адаптивность */
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             .card { padding: 18px; }
@@ -442,7 +435,6 @@
             .card { padding: 15px; }
         }
         
-        /* Скрытые элементы */
         #registerCard { display: none; }
         #adminContent { display: none; }
     </style>
@@ -540,7 +532,42 @@
         let currentUser = null;
         let selectedImageData = null;
 
-        // Рендер карт
+        // Загрузка постов из localStorage
+        function loadPosts() {
+            const saved = localStorage.getItem('fishing_posts');
+            if (saved) {
+                try {
+                    posts = JSON.parse(saved);
+                } catch {
+                    posts = [];
+                }
+            }
+        }
+
+        // Сохранение постов в localStorage
+        function savePosts() {
+            localStorage.setItem('fishing_posts', JSON.stringify(posts));
+        }
+
+        // Загрузка пользователей из localStorage
+        function loadUsers() {
+            const saved = localStorage.getItem('fishing_users');
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch {
+                    return {};
+                }
+            }
+            return {};
+        }
+
+        // Сохранение пользователей в localStorage
+        function saveUsers(users) {
+            localStorage.setItem('fishing_users', JSON.stringify(users));
+        }
+
+        // ---------- КАРТЫ ----------
         function renderMaps() {
             const container = document.getElementById('mapContainer');
             container.innerHTML = '';
@@ -578,8 +605,8 @@
             }
         });
 
-        // ---------- ВХОД ----------
-        async function login() {
+        // ---------- АВТОРИЗАЦИЯ ----------
+        function login() {
             const username = document.getElementById('loginInput').value.trim();
             const password = document.getElementById('passwordInput').value.trim();
             
@@ -589,36 +616,32 @@
                 return;
             }
 
-            try {
-                const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    currentUser = data.user;
-                    document.getElementById('statusDot').className = 'status-dot online';
-                    document.getElementById('statusText').textContent = currentUser.nick + ' (' + currentUser.role + ')';
-                    
-                    let roleBadge = document.getElementById('userRole');
-                    roleBadge.style.display = 'inline-block';
-                    roleBadge.className = 'role-badge ' + currentUser.role;
-                    roleBadge.textContent = currentUser.role.toUpperCase();
-                    
-                    document.getElementById('authStatus').innerHTML = 
-                        '<div class="alert alert-success">✅ Добро пожаловать, ' + currentUser.nick + '!</div>';
-                    
-                    document.getElementById('loginCard').style.display = 'none';
-                } else {
-                    document.getElementById('authStatus').innerHTML = 
-                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
-                }
-            } catch (error) {
+            const users = loadUsers();
+            
+            // Проверка админа
+            if (username === 'smetana123' && password === '123456') {
+                currentUser = { username: 'smetana123', role: 'admin', nick: 'Админ' };
+                document.getElementById('statusDot').className = 'status-dot online';
+                document.getElementById('statusText').textContent = 'Админ (admin)';
                 document.getElementById('authStatus').innerHTML = 
-                    '<div class="alert alert-danger">❌ Ошибка: ' + error.message + '</div>';
+                    '<div class="alert alert-success">✅ Добро пожаловать, Админ!</div>';
+                document.getElementById('loginCard').style.display = 'none';
+                return;
             }
+            
+            // Проверка обычного пользователя
+            if (users[username] && users[username].password === password) {
+                currentUser = { username: username, role: users[username].role || 'user', nick: users[username].nick || username };
+                document.getElementById('statusDot').className = 'status-dot online';
+                document.getElementById('statusText').textContent = currentUser.nick + ' (' + currentUser.role + ')';
+                document.getElementById('authStatus').innerHTML = 
+                    '<div class="alert alert-success">✅ Добро пожаловать, ' + currentUser.nick + '!</div>';
+                document.getElementById('loginCard').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('authStatus').innerHTML = 
+                '<div class="alert alert-danger">❌ Неверный логин или пароль</div>';
         }
 
         document.getElementById('loginBtn').addEventListener('click', login);
@@ -636,7 +659,7 @@
             document.getElementById('regStatus').innerHTML = '';
         });
 
-        document.getElementById('regSubmitBtn').addEventListener('click', async function() {
+        document.getElementById('regSubmitBtn').addEventListener('click', function() {
             const username = document.getElementById('regLoginInput').value.trim();
             const password = document.getElementById('regPasswordInput').value.trim();
             const nick = document.getElementById('regNickInput').value.trim() || username;
@@ -647,31 +670,30 @@
                 return;
             }
 
-            try {
-                const response = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, nick })
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('regStatus').innerHTML = 
-                        '<div class="alert alert-success">✅ Регистрация успешна! Теперь войдите.</div>';
-                    document.getElementById('loginInput').value = username;
-                    document.getElementById('passwordInput').value = password;
-                    setTimeout(() => {
-                        document.getElementById('registerCard').style.display = 'none';
-                        document.getElementById('regStatus').innerHTML = '';
-                    }, 2000);
-                } else {
-                    document.getElementById('regStatus').innerHTML = 
-                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
-                }
-            } catch (error) {
+            const users = loadUsers();
+            
+            if (users[username] || username === 'smetana123') {
                 document.getElementById('regStatus').innerHTML = 
-                    '<div class="alert alert-danger">❌ ' + error.message + '</div>';
+                    '<div class="alert alert-danger">❌ Пользователь уже существует</div>';
+                return;
             }
+
+            users[username] = {
+                password: password,
+                role: 'user',
+                nick: nick
+            };
+            saveUsers(users);
+
+            document.getElementById('regStatus').innerHTML = 
+                '<div class="alert alert-success">✅ Регистрация успешна! Теперь войдите.</div>';
+            document.getElementById('loginInput').value = username;
+            document.getElementById('passwordInput').value = password;
+            
+            setTimeout(() => {
+                document.getElementById('registerCard').style.display = 'none';
+                document.getElementById('regStatus').innerHTML = '';
+            }, 2000);
         });
 
         // ---------- РАБОТА С ИЗОБРАЖЕНИЯМИ ----------
@@ -695,29 +717,17 @@
         });
 
         // ---------- ПОСТЫ ----------
-        async function fetchPosts() {
-            try {
-                const response = await fetch('/api/posts');
-                const data = await response.json();
-                return data.success ? data.posts : [];
-            } catch {
-                return [];
-            }
-        }
-
-        async function renderFeed() {
+        function renderFeed() {
             const container = document.getElementById('feedContainer');
-            container.innerHTML = '<div class="empty-state"><i>⏳</i>Загрузка...</div>';
+            loadPosts();
             
-            const postsData = await fetchPosts();
-            
-            if (!postsData || postsData.length === 0) {
+            if (posts.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i>🎣</i>Пока нет постов. Будьте первым!</div>';
                 return;
             }
 
             let html = '';
-            postsData.slice().reverse().forEach(post => {
+            posts.slice().reverse().forEach((post, index) => {
                 const roleClass = post.role || 'user';
                 const roleIcon = roleClass === 'admin' ? '👑' : roleClass === 'moderator' ? '🛡️' : '🎣';
                 const canDelete = currentUser && (currentUser.role === 'admin' || currentUser.nick === post.nick);
@@ -730,7 +740,7 @@
                                 <span class="role-badge ${roleClass}">${roleIcon} ${roleClass.toUpperCase()}</span>
                                 <span class="map">📍 ${post.map || 'Комариное'}</span>
                             </div>
-                            ${canDelete ? `<span class="delete-btn" onclick="deletePost('${post.id}')">🗑️ Удалить</span>` : ''}
+                            ${canDelete ? `<span class="delete-btn" onclick="deletePost(${index})">🗑️ Удалить</span>` : ''}
                         </div>
                         <div class="text">${post.text}</div>
                         ${post.imageData ? `<img src="${post.imageData}" alt="Фото">` : ''}
@@ -741,34 +751,18 @@
             container.innerHTML = html;
         }
 
-        window.deletePost = async function(postId) {
+        window.deletePost = function(index) {
             if (!confirm('Удалить этот пост?')) return;
-            
-            try {
-                const response = await fetch(`/api/posts/${postId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role: currentUser?.role || 'user', nick: currentUser?.nick || '' })
-                });
-                const data = await response.json();
-                if (data.success) {
-                    renderFeed();
-                    document.getElementById('publishStatus').innerHTML = 
-                        '<div class="alert alert-success">✅ Пост удален</div>';
-                    setTimeout(() => {
-                        document.getElementById('publishStatus').innerHTML = '';
-                    }, 3000);
-                }
-            } catch (error) {
-                document.getElementById('publishStatus').innerHTML = 
-                    '<div class="alert alert-danger">❌ Ошибка удаления</div>';
-            }
+            const realIndex = posts.length - 1 - index;
+            posts.splice(realIndex, 1);
+            savePosts();
+            renderFeed();
         };
 
         document.getElementById('refreshBtn').addEventListener('click', renderFeed);
 
         // ---------- ПУБЛИКАЦИЯ ПОСТА ----------
-        async function publishPost() {
+        function publishPost() {
             if (!currentUser) {
                 document.getElementById('publishStatus').innerHTML = 
                     '<div class="alert alert-warning">⚠️ Сначала войдите в систему!</div>';
@@ -783,55 +777,52 @@
                 return;
             }
 
-            try {
-                const response = await fetch('/api/posts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nick: currentUser.nick,
-                        role: currentUser.role,
-                        map: selectedMap,
-                        text: text || 'Без текста',
-                        imageData: selectedImageData
-                    })
-                });
-                const data = await response.json();
+            const post = {
+                nick: currentUser.nick,
+                role: currentUser.role,
+                map: selectedMap,
+                text: text || 'Без текста',
+                imageData: selectedImageData,
+                created_at: new Date().toLocaleString('ru-RU')
+            };
 
-                if (data.success) {
-                    document.getElementById('publishStatus').innerHTML = 
-                        '<div class="alert alert-success">✅ Пост опубликован!</div>';
-                    document.getElementById('postContent').value = '';
-                    document.getElementById('postImageInput').value = '';
-                    selectedImageData = null;
-                    document.getElementById('imagePreviewContainer').style.display = 'none';
-                    document.getElementById('imagePreview').src = '#';
-                    renderFeed();
-                    setTimeout(() => {
-                        document.getElementById('publishStatus').innerHTML = '';
-                    }, 3000);
-                } else {
-                    document.getElementById('publishStatus').innerHTML = 
-                        '<div class="alert alert-danger">❌ ' + data.error + '</div>';
-                }
-            } catch (error) {
-                document.getElementById('publishStatus').innerHTML = 
-                    '<div class="alert alert-danger">❌ ' + error.message + '</div>';
-            }
+            posts.push(post);
+            savePosts();
+
+            document.getElementById('publishStatus').innerHTML = 
+                '<div class="alert alert-success">✅ Пост опубликован!</div>';
+            document.getElementById('postContent').value = '';
+            document.getElementById('postImageInput').value = '';
+            selectedImageData = null;
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('imagePreview').src = '#';
+            renderFeed();
+
+            setTimeout(() => {
+                document.getElementById('publishStatus').innerHTML = '';
+            }, 3000);
         }
 
         document.getElementById('publishBtn').addEventListener('click', publishPost);
 
         // ---------- ИНИЦИАЛИЗАЦИЯ ----------
+        loadPosts();
         renderMaps();
         renderFeed();
 
-        // Автовход
+        // Автовход для теста
         setTimeout(() => {
-            if (!currentUser) login();
+            if (!currentUser) {
+                // Пробуем автоматически войти
+                document.getElementById('loginInput').value = 'smetana123';
+                document.getElementById('passwordInput').value = '123456';
+                login();
+            }
         }, 500);
 
         console.log('🎣 Русская рыбалка 4 точки загружена!');
         console.log('🔑 Логин: smetana123, Пароль: 123456');
+        console.log('📁 Все данные хранятся в localStorage браузера');
     </script>
 </body>
 </html>
