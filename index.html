@@ -44,16 +44,6 @@
             font-family: 'Georgia', serif;
         }
         
-        h1 i {
-            animation: float 3s ease-in-out infinite;
-            display: inline-block;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
         .card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
@@ -75,8 +65,6 @@
             margin-bottom: 15px;
             font-size: 1.3rem;
         }
-        
-        .card h3 i { margin-right: 10px; }
         
         input, textarea {
             width: 100%;
@@ -234,12 +222,6 @@
             background: rgba(255, 107, 107, 0.2);
             color: #ff6b6b;
             border: 1px solid #ff6b6b;
-        }
-        
-        .role-badge.moderator {
-            background: rgba(255, 217, 61, 0.2);
-            color: #ffd93d;
-            border: 1px solid #ffd93d;
         }
         
         .role-badge.user {
@@ -436,7 +418,7 @@
         }
         
         #registerCard { display: none; }
-        #adminContent { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -453,8 +435,8 @@
         <!-- Вход -->
         <div class="card" id="loginCard">
             <h3>🔑 Вход</h3>
-            <input type="text" id="loginInput" placeholder="Логин" value="smetana123">
-            <input type="password" id="passwordInput" placeholder="Пароль" value="123456">
+            <input type="text" id="loginInput" placeholder="Логин" value="admin">
+            <input type="password" id="passwordInput" placeholder="Пароль" value="admin123">
             <div class="btn-group">
                 <button id="loginBtn">Войти</button>
                 <button id="registerBtn" class="btn-outline">Регистрация</button>
@@ -519,7 +501,7 @@
     </div>
 
     <script>
-        // ---------- КАРТЫ ----------
+        // ---------- ДАННЫЕ ----------
         const MAPS = [
             "Комариное", "Лосиное", "Вьюнок", "Старый острог", "Белая", 
             "Куори", "Медвежка", "Волхов", "Северский донец", "Сура", 
@@ -532,29 +514,23 @@
         let currentUser = null;
         let selectedImageData = null;
 
-        // Загрузка постов из localStorage
-        function loadPosts() {
-            const saved = localStorage.getItem('fishing_posts');
-            if (saved) {
+        // ---------- РАБОТА С LOCALSTORAGE ----------
+        function loadData() {
+            // Загрузка постов
+            const savedPosts = localStorage.getItem('fishing_posts');
+            if (savedPosts) {
                 try {
-                    posts = JSON.parse(saved);
+                    posts = JSON.parse(savedPosts);
                 } catch {
                     posts = [];
                 }
             }
-        }
-
-        // Сохранение постов в localStorage
-        function savePosts() {
-            localStorage.setItem('fishing_posts', JSON.stringify(posts));
-        }
-
-        // Загрузка пользователей из localStorage
-        function loadUsers() {
-            const saved = localStorage.getItem('fishing_users');
-            if (saved) {
+            
+            // Загрузка пользователей
+            const savedUsers = localStorage.getItem('fishing_users');
+            if (savedUsers) {
                 try {
-                    return JSON.parse(saved);
+                    return JSON.parse(savedUsers);
                 } catch {
                     return {};
                 }
@@ -562,7 +538,10 @@
             return {};
         }
 
-        // Сохранение пользователей в localStorage
+        function savePosts() {
+            localStorage.setItem('fishing_posts', JSON.stringify(posts));
+        }
+
         function saveUsers(users) {
             localStorage.setItem('fishing_users', JSON.stringify(users));
         }
@@ -616,32 +595,42 @@
                 return;
             }
 
-            const users = loadUsers();
+            const users = loadData();
             
-            // Проверка админа
-            if (username === 'smetana123' && password === '123456') {
-                currentUser = { username: 'smetana123', role: 'admin', nick: 'Админ' };
-                document.getElementById('statusDot').className = 'status-dot online';
-                document.getElementById('statusText').textContent = 'Админ (admin)';
-                document.getElementById('authStatus').innerHTML = 
-                    '<div class="alert alert-success">✅ Добро пожаловать, Админ!</div>';
-                document.getElementById('loginCard').style.display = 'none';
+            // Проверка админа (встроенный)
+            if (username === 'admin' && password === 'admin123') {
+                currentUser = { username: 'admin', role: 'admin', nick: 'Админ' };
+                updateUI();
                 return;
             }
             
             // Проверка обычного пользователя
             if (users[username] && users[username].password === password) {
-                currentUser = { username: username, role: users[username].role || 'user', nick: users[username].nick || username };
-                document.getElementById('statusDot').className = 'status-dot online';
-                document.getElementById('statusText').textContent = currentUser.nick + ' (' + currentUser.role + ')';
-                document.getElementById('authStatus').innerHTML = 
-                    '<div class="alert alert-success">✅ Добро пожаловать, ' + currentUser.nick + '!</div>';
-                document.getElementById('loginCard').style.display = 'none';
+                currentUser = { 
+                    username: username, 
+                    role: users[username].role || 'user', 
+                    nick: users[username].nick || username 
+                };
+                updateUI();
                 return;
             }
             
             document.getElementById('authStatus').innerHTML = 
                 '<div class="alert alert-danger">❌ Неверный логин или пароль</div>';
+        }
+
+        function updateUI() {
+            document.getElementById('statusDot').className = 'status-dot online';
+            document.getElementById('statusText').textContent = currentUser.nick + ' (' + currentUser.role + ')';
+            
+            let roleBadge = document.getElementById('userRole');
+            roleBadge.style.display = 'inline-block';
+            roleBadge.className = 'role-badge ' + currentUser.role;
+            roleBadge.textContent = currentUser.role.toUpperCase();
+            
+            document.getElementById('authStatus').innerHTML = 
+                '<div class="alert alert-success">✅ Добро пожаловать, ' + currentUser.nick + '!</div>';
+            document.getElementById('loginCard').style.display = 'none';
         }
 
         document.getElementById('loginBtn').addEventListener('click', login);
@@ -670,9 +659,9 @@
                 return;
             }
 
-            const users = loadUsers();
+            const users = loadData();
             
-            if (users[username] || username === 'smetana123') {
+            if (users[username] || username === 'admin') {
                 document.getElementById('regStatus').innerHTML = 
                     '<div class="alert alert-danger">❌ Пользователь уже существует</div>';
                 return;
@@ -719,7 +708,7 @@
         // ---------- ПОСТЫ ----------
         function renderFeed() {
             const container = document.getElementById('feedContainer');
-            loadPosts();
+            loadData();
             
             if (posts.length === 0) {
                 container.innerHTML = '<div class="empty-state"><i>🎣</i>Пока нет постов. Будьте первым!</div>';
@@ -729,8 +718,9 @@
             let html = '';
             posts.slice().reverse().forEach((post, index) => {
                 const roleClass = post.role || 'user';
-                const roleIcon = roleClass === 'admin' ? '👑' : roleClass === 'moderator' ? '🛡️' : '🎣';
+                const roleIcon = roleClass === 'admin' ? '👑' : '🎣';
                 const canDelete = currentUser && (currentUser.role === 'admin' || currentUser.nick === post.nick);
+                const realIndex = posts.length - 1 - index;
                 
                 html += `
                     <div class="post">
@@ -740,7 +730,7 @@
                                 <span class="role-badge ${roleClass}">${roleIcon} ${roleClass.toUpperCase()}</span>
                                 <span class="map">📍 ${post.map || 'Комариное'}</span>
                             </div>
-                            ${canDelete ? `<span class="delete-btn" onclick="deletePost(${index})">🗑️ Удалить</span>` : ''}
+                            ${canDelete ? `<span class="delete-btn" onclick="deletePost(${realIndex})">🗑️ Удалить</span>` : ''}
                         </div>
                         <div class="text">${post.text}</div>
                         ${post.imageData ? `<img src="${post.imageData}" alt="Фото">` : ''}
@@ -753,8 +743,7 @@
 
         window.deletePost = function(index) {
             if (!confirm('Удалить этот пост?')) return;
-            const realIndex = posts.length - 1 - index;
-            posts.splice(realIndex, 1);
+            posts.splice(index, 1);
             savePosts();
             renderFeed();
         };
@@ -806,22 +795,21 @@
         document.getElementById('publishBtn').addEventListener('click', publishPost);
 
         // ---------- ИНИЦИАЛИЗАЦИЯ ----------
-        loadPosts();
+        loadData();
         renderMaps();
         renderFeed();
 
         // Автовход для теста
         setTimeout(() => {
             if (!currentUser) {
-                // Пробуем автоматически войти
-                document.getElementById('loginInput').value = 'smetana123';
-                document.getElementById('passwordInput').value = '123456';
+                document.getElementById('loginInput').value = 'admin';
+                document.getElementById('passwordInput').value = 'admin123';
                 login();
             }
-        }, 500);
+        }, 300);
 
         console.log('🎣 Русская рыбалка 4 точки загружена!');
-        console.log('🔑 Логин: smetana123, Пароль: 123456');
+        console.log('🔑 Логин: admin, Пароль: admin123');
         console.log('📁 Все данные хранятся в localStorage браузера');
     </script>
 </body>
