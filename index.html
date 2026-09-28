@@ -1,261 +1,1082 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔒 Учебный стенд по информационной безопасности</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: #e0e0e0;
-        }
-        .container {
-            background: rgba(20, 20, 40, 0.9);
-            border: 2px solid #ff6b35;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 0 60px rgba(255, 107, 53, 0.2);
-            backdrop-filter: blur(10px);
-        }
-        .warning {
-            background: #ff6b35;
-            color: #000;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 2em;
-            margin-bottom: 10px;
-            color: #ff6b35;
-        }
-        .subtitle {
-            text-align: center;
-            color: #aaa;
-            margin-bottom: 30px;
-            font-style: italic;
-        }
-        .data-block {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .data-block h3 {
-            color: #ff6b35;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-        }
-        .data-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.95em;
-        }
-        .data-item .label {
-            color: #888;
-        }
-        .data-item .value {
-            color: #fff;
-            font-weight: 500;
-            word-break: break-all;
-            text-align: right;
-            max-width: 60%;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 0.85em;
-            color: #666;
-        }
-        .footer a {
-            color: #ff6b35;
-            text-decoration: none;
-        }
-        .badge {
-            display: inline-block;
-            background: #ff6b35;
-            color: #000;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75em;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFT Galaxy — Премиум коллекция</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+
+  :root {
+    --yellow: #FFD93D;
+    --yellow-bright: #FFE66D;
+    --purple: #7B2CBF;
+    --purple-dark: #3C096C;
+    --purple-light: #9D4EDD;
+    --violet-glow: #C77DFF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #0a0118;
+    color: #fff;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Переливающийся фон */
+  .bg-animated {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: linear-gradient(-45deg, #1a0033, #3C096C, #240046, #10002B, #3C096C, #1a0033);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+  }
+
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(255, 217, 61, 0.22) 0%, transparent 45%),
+      radial-gradient(circle at 85% 30%, rgba(199, 125, 255, 0.28) 0%, transparent 50%),
+      radial-gradient(circle at 50% 85%, rgba(123, 44, 191, 0.30) 0%, transparent 55%);
+    animation: glowPulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes glowPulse {
+    0% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.08); }
+  }
+
+  /* Шапка */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 6%;
+    backdrop-filter: blur(18px);
+    background: rgba(20, 0, 45, 0.55);
+    border-bottom: 1px solid rgba(199, 125, 255, 0.25);
+  }
+
+  .logo {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow), var(--yellow));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 3s linear infinite;
+    letter-spacing: 1px;
+    cursor: pointer;
+  }
+
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+
+  nav {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+
+  nav a {
+    color: #e0c3ff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: 0.3s;
+    position: relative;
+  }
+
+  nav a:hover {
+    color: var(--yellow);
+    text-shadow: 0 0 12px rgba(255, 217, 61, 0.8);
+  }
+
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; left: 0;
+    width: 0; height: 2px;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow));
+    transition: width 0.3s;
+  }
+
+  nav a:hover::after { width: 100%; }
+
+  .admin-btn {
+    padding: 9px 20px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, var(--purple), var(--violet-glow));
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 18px rgba(157, 78, 221, 0.6);
+  }
+
+  .admin-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 0 28px rgba(199, 125, 255, 0.9);
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 90px 6% 70px;
+  }
+
+  .hero h1 {
+    font-size: clamp(34px, 6vw, 72px);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(120deg, var(--yellow) 0%, var(--violet-glow) 40%, var(--yellow-bright) 70%, var(--yellow) 100%);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+    margin-bottom: 22px;
+    text-shadow: 0 0 60px rgba(199, 125, 255, 0.35);
+  }
+
+  .hero p {
+    font-size: clamp(15px, 2vw, 19px);
+    color: #d8c2ff;
+    max-width: 680px;
+    margin: 0 auto 34px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    padding: 14px 34px;
+    border-radius: 40px;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-bright), var(--yellow));
+    background-size: 200% auto;
+    color: #2b0a4a;
+    transition: 0.35s;
+    box-shadow: 0 0 25px rgba(255, 217, 61, 0.55);
+  }
+
+  .btn-primary:hover {
+    background-position: right center;
+    transform: translateY(-3px);
+    box-shadow: 0 0 40px rgba(255, 217, 61, 0.9);
+  }
+
+  .btn-outline {
+    padding: 14px 34px;
+    border-radius: 40px;
+    background: transparent;
+    color: var(--yellow);
+    border: 2px solid var(--yellow);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.35s;
+  }
+
+  .btn-outline:hover {
+    background: var(--yellow);
+    color: #2b0a4a;
+    box-shadow: 0 0 30px rgba(255, 217, 61, 0.7);
+  }
+
+  /* Секции */
+  section { padding: 60px 6%; }
+
+  .section-title {
+    text-align: center;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow), var(--yellow));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+
+  .section-sub {
+    text-align: center;
+    color: #b99fe0;
+    margin-bottom: 48px;
+    font-size: 16px;
+  }
+
+  /* Сетка NFT */
+  .nft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 26px;
+  }
+
+  .nft-card {
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(160deg, rgba(60, 9, 108, 0.75), rgba(26, 0, 51, 0.9));
+    border: 1px solid rgba(199, 125, 255, 0.3);
+    transition: 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    position: relative;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+
+  .nft-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    padding: 2px;
+    background: linear-gradient(130deg, var(--yellow), var(--violet-glow), var(--purple-light), var(--yellow));
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderFlow 5s linear infinite;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+  }
+
+  .nft-card:hover::before { opacity: 1; }
+
+  @keyframes borderFlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+  }
+
+  .nft-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 50px rgba(157, 78, 221, 0.55), 0 0 40px rgba(255, 217, 61, 0.25);
+  }
+
+  .nft-image {
+    width: 100%;
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 70px;
+  }
+
+  .nft-image .gradient-bg {
+    position: absolute;
+    inset: 0;
+    animation: gradientFlow 8s ease infinite;
+    background-size: 300% 300%;
+  }
+
+  .nft-image .emoji {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 20px rgba(255, 217, 61, 0.8));
+    animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+  }
+
+  .nft-info {
+    padding: 18px 20px 22px;
+  }
+
+  .nft-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .nft-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .nft-price {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--yellow);
+    text-shadow: 0 0 12px rgba(255, 217, 61, 0.6);
+  }
+
+  .nft-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(199, 125, 255, 0.2);
+    color: var(--violet-glow);
+    border: 1px solid rgba(199, 125, 255, 0.4);
+    font-weight: 600;
+  }
+
+  .nft-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 3;
+    background: linear-gradient(135deg, var(--yellow), #FFA500);
+    color: #2b0a4a;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(255, 217, 61, 0.7);
+  }
+
+  /* Модальное окно NFT */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 0, 25, 0.85);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .modal-overlay.active { display: flex; animation: fadeIn 0.3s; }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: linear-gradient(160deg, #2a0a4d, #150030);
+    border: 2px solid var(--violet-glow);
+    border-radius: 26px;
+    max-width: 460px;
+    width: 100%;
+    padding: 28px;
+    position: relative;
+    box-shadow: 0 0 60px rgba(157, 78, 221, 0.6);
+    animation: popIn 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 18px;
+    background: transparent;
+    border: none;
+    color: var(--violet-glow);
+    font-size: 26px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .modal-close:hover { color: var(--yellow); transform: rotate(90deg); }
+
+  .modal-img {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 18px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 90px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .modal-img .gradient-bg {
+    position: absolute;
+    inset: 0;
+    animation: gradientFlow 8s ease infinite;
+    background-size: 300% 300%;
+  }
+
+  .modal-img .emoji {
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 0 25px rgba(255, 217, 61, 0.9));
+  }
+
+  .modal h3 { font-size: 24px; margin-bottom: 8px; color: #fff; }
+
+  .modal .modal-price {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--yellow);
+    margin-bottom: 16px;
+    text-shadow: 0 0 14px rgba(255, 217, 61, 0.6);
+  }
+
+  .modal .modal-desc { color: #c8b0ea; line-height: 1.6; font-size: 14px; margin-bottom: 22px; }
+
+  /* Админ-модалка */
+  .admin-modal {
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .admin-modal h3 {
+    font-size: 22px;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .admin-modal p { color: #b99fe0; font-size: 13px; margin-bottom: 22px; }
+
+  .admin-input {
+    width: 100%;
+    padding: 13px 16px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(199, 125, 255, 0.4);
+    background: rgba(20, 0, 45, 0.7);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  .admin-input:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 18px rgba(255, 217, 61, 0.4);
+  }
+
+  .admin-input::placeholder { color: #8a72b8; }
+
+  .admin-submit {
+    width: 100%;
+    padding: 13px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, var(--yellow), var(--yellow-bright));
+    color: #2b0a4a;
+    font-weight: 800;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 0 22px rgba(255, 217, 61, 0.5);
+  }
+
+  .admin-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(255, 217, 61, 0.9);
+  }
+
+  .error-msg {
+    color: #ff6b9d;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 18px;
+    font-weight: 600;
+  }
+
+  /* Панель администратора */
+  #adminPanel {
+    display: none;
+    padding: 40px 6%;
+    min-height: 60vh;
+  }
+
+  #adminPanel.active { display: block; animation: fadeIn 0.5s; }
+
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 34px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .admin-header h2 {
+    font-size: 30px;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .admin-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .admin-add-form {
+    background: linear-gradient(160deg, rgba(60, 9, 108, 0.6), rgba(26, 0, 51, 0.8));
+    border: 1px solid rgba(199, 125, 255, 0.3);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 34px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    align-items: end;
+  }
+
+  .admin-field label {
+    display: block;
+    font-size: 12px;
+    color: var(--violet-glow);
+    margin-bottom: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .admin-field input, .admin-field select {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(199, 125, 255, 0.35);
+    background: rgba(20, 0, 45, 0.7);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  .admin-field input:focus, .admin-field select:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 14px rgba(255, 217, 61, 0.4);
+  }
+
+  .admin-field select option { background: #2a0a4d; }
+
+  .admin-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-radius: 14px;
+    background: rgba(60, 9, 108, 0.4);
+    border: 1px solid rgba(199, 125, 255, 0.25);
+    margin-bottom: 12px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .admin-list-item .info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+  }
+
+  .admin-list-item .mini-emoji {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .admin-list-item .name { font-weight: 700; color: #fff; }
+  .admin-list-item .price { font-size: 13px; color: var(--yellow); }
+
+  .delete-btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #ff4d6d, #ff6b9d);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .delete-btn:hover { transform: scale(1.05); box-shadow: 0 0 18px rgba(255, 77, 109, 0.7); }
+
+  .logout-btn {
+    padding: 10px 22px;
+    border-radius: 30px;
+    border: 2px solid var(--yellow);
+    background: transparent;
+    color: var(--yellow);
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .logout-btn:hover { background: var(--yellow); color: #2b0a4a; }
+
+  /* Статистика */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 26px 18px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(60, 9, 108, 0.5), rgba(26, 0, 51, 0.7));
+    border: 1px solid rgba(199, 125, 255, 0.25);
+    transition: 0.35s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--yellow);
+    box-shadow: 0 0 30px rgba(255, 217, 61, 0.3);
+  }
+
+  .stat-num {
+    font-size: 32px;
+    font-weight: 900;
+    background: linear-gradient(90deg, var(--yellow), var(--violet-glow));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label { font-size: 13px; color: #b99fe0; margin-top: 6px; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 6%;
+    color: #8a72b8;
+    font-size: 13px;
+    border-top: 1px solid rgba(199, 125, 255, 0.2);
+    margin-top: 40px;
+  }
+
+  footer .logo { font-size: 20px; margin-bottom: 10px; }
+
+  /* Тост */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 14px 24px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--purple), var(--violet-glow));
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 0 30px rgba(157, 78, 221, 0.7);
+    transform: translateY(120px);
+    opacity: 0;
+    transition: 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+    z-index: 2000;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    nav { gap: 14px; }
+    nav a { font-size: 13px; }
+    header { padding: 14px 4%; }
+    section { padding: 40px 4%; }
+    .admin-list-item { flex-direction: column; align-items: stretch; }
+    .admin-list-item .info { justify-content: space-between; }
+  }
+
+  @media (max-width: 500px) {
+    nav a:not(.admin-btn) { display: none; }
+  }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <!-- ЯВНОЕ ПРЕДУПРЕЖДЕНИЕ -->
-    <div class="warning">
-        ⚠️ УЧЕБНЫЙ СТЕНД — ТОЛЬКО ДЛЯ ОБРАЗОВАТЕЛЬНЫХ ЦЕЛЕЙ ⚠️
-    </div>
+<div class="bg-animated"></div>
+<div class="bg-glow"></div>
 
-    <h1>🔍 Сбор данных о посетителе</h1>
-    <p class="subtitle">Демонстрация того, какую информацию может получить сайт</p>
+<header>
+  <div class="logo" onclick="goHome()">◆ NFT Galaxy</div>
+  <nav>
+    <a href="#collection">Коллекция</a>
+    <a href="#stats">Статистика</a>
+    <button class="admin-btn" onclick="openAdminModal()">🔐 Админ</button>
+  </nav>
+</header>
 
-    <div class="data-block">
-        <h3>🌐 Основные данные</h3>
-        <div class="data-item">
-            <span class="label">IP-адрес (через API)</span>
-            <span class="value" id="ip">Загрузка...</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Страна (по IP)</span>
-            <span class="value" id="country">Загрузка...</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Браузер</span>
-            <span class="value" id="browser">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Операционная система</span>
-            <span class="value" id="os">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Разрешение экрана</span>
-            <span class="value" id="screen">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Время доступа</span>
-            <span class="value" id="time">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Язык браузера</span>
-            <span class="value" id="lang">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">User-Agent (полный)</span>
-            <span class="value" id="ua" style="font-size:0.8em;">—</span>
-        </div>
+<!-- Главная -->
+<main id="mainContent">
+  <section class="hero">
+    <h1>Коллекция<br>Премиум NFT</h1>
+    <p>Уникальные цифровые произведения искусства. Каждый NFT — это единственный в своём роде шедевр, созданный для истинных ценителей прекрасного.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('collection').scrollIntoView()">Смотреть коллекцию</button>
+      <button class="btn-outline" onclick="document.getElementById('stats').scrollIntoView()">Статистика</button>
     </div>
+  </section>
 
-    <div class="data-block" style="border-color: #ff6b35;">
-        <h3>📊 Дополнительно (имитация)</h3>
-        <div class="data-item">
-            <span class="label">Время загрузки страницы</span>
-            <span class="value" id="loadtime">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Куки (cookie)</span>
-            <span class="value" id="cookies">—</span>
-        </div>
-        <div class="data-item">
-            <span class="label">Referrer (откуда пришли)</span>
-            <span class="value" id="referrer">—</span>
-        </div>
-    </div>
+  <section id="collection">
+    <h2 class="section-title">✨ Избранные NFT</h2>
+    <p class="section-sub">Только самые красивые экземпляры коллекции</p>
+    <div class="nft-grid" id="nftGrid"></div>
+  </section>
 
-    <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255,107,53,0.1); border-radius: 10px;">
-        <span class="badge">🔒 БЕЗОПАСНО</span>
-        <span style="color: #888; margin-left: 10px; font-size: 0.9em;">
-            Данные НЕ отправляются на сервер — только для локального просмотра
-        </span>
+  <section id="stats">
+    <h2 class="section-title">📊 Статистика</h2>
+    <p class="section-sub">Наша коллекция в цифрах</p>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-num" id="statCount">0</div>
+        <div class="stat-label">Уникальных NFT</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statOwners">0</div>
+        <div class="stat-label">Владельцев</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statEth">0</div>
+        <div class="stat-label">Объём (ETH)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Торговля</div>
+      </div>
     </div>
+  </section>
+</main>
 
-    <div class="footer">
-        <p>Создано в образовательных целях. <br>
-        <a href="#" onclick="alert('Это демонстрационный стенд. Данные не сохраняются и не передаются.')">Подробнее</a></p>
+<!-- Админ-панель -->
+<section id="adminPanel">
+  <div class="admin-header">
+    <h2>⚙️ Панель администратора</h2>
+    <div class="admin-actions">
+      <button class="logout-btn" onclick="logout()">Выйти</button>
     </div>
+  </div>
+
+  <div class="admin-add-form">
+    <div class="admin-field">
+      <label>Название</label>
+      <input type="text" id="newName" placeholder="Cosmic Dream #1">
+    </div>
+    <div class="admin-field">
+      <label>Цена (ETH)</label>
+      <input type="number" id="newPrice" placeholder="2.5" step="0.01" min="0">
+    </div>
+    <div class="admin-field">
+      <label>Эмодзи</label>
+      <input type="text" id="newEmoji" placeholder="🌌" maxlength="4">
+    </div>
+    <div class="admin-field">
+      <label>Градиент</label>
+      <select id="newGradient">
+        <option value="linear-gradient(135deg,#7B2CBF,#FFD93D)">Фиолет-Жёлтый</option>
+        <option value="linear-gradient(135deg,#FFD93D,#9D4EDD)">Жёлтый-Фиолет</option>
+        <option value="linear-gradient(135deg,#3C096C,#C77DFF)">Тёмно-Фиолет</option>
+        <option value="linear-gradient(135deg,#FFE66D,#7B2CBF)">Золото-Пурпур</option>
+        <option value="linear-gradient(135deg,#9D4EDD,#FFD93D,#7B2CBF)">Триколор</option>
+        <option value="linear-gradient(135deg,#240046,#FFD93D)">Ночь-Золото</option>
+      </select>
+    </div>
+    <div class="admin-field">
+      <label>Тег</label>
+      <input type="text" id="newTag" placeholder="Rare" maxlength="12">
+    </div>
+    <div class="admin-field">
+      <label>&nbsp;</label>
+      <button class="admin-submit" onclick="addNFT()">➕ Добавить NFT</button>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom:18px;color:#c8b0ea;">Управление коллекцией (<span id="adminCount">0</span>)</h3>
+  <div id="adminList"></div>
+</section>
+
+<footer>
+  <div class="logo">◆ NFT Galaxy</div>
+  <p>© 2024 NFT Galaxy. Все права защищены. Премиум цифровое искусство.</p>
+</footer>
+
+<!-- Модалка NFT -->
+<div class="modal-overlay" id="nftModal" onclick="closeNftModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeNftModal()">×</button>
+    <div class="modal-img" id="modalImg">
+      <div class="gradient-bg" id="modalGradient"></div>
+      <div class="emoji" id="modalEmoji">🌌</div>
+    </div>
+    <h3 id="modalName">NFT</h3>
+    <div class="modal-price" id="modalPrice">0 ETH</div>
+    <p class="modal-desc" id="modalDesc">Уникальное цифровое произведение искусства из эксклюзивной коллекции NFT Galaxy.</p>
+    <button class="admin-submit" onclick="toast('Спасибо за интерес! 💜')">Купить сейчас</button>
+  </div>
 </div>
 
+<!-- Модалка админа -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal admin-modal">
+    <button class="modal-close" onclick="closeAdminModal()">×</button>
+    <h3>🔐 Вход в админ-панель</h3>
+    <p>Введите учётные данные</p>
+    <input type="text" class="admin-input" id="adminLogin" placeholder="Логин" autocomplete="off">
+    <input type="password" class="admin-input" id="adminPass" placeholder="Пароль" autocomplete="off">
+    <button class="admin-submit" onclick="tryLogin()">Войти</button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-    (function() {
-        // --- БАЗОВЫЕ ДАННЫЕ БРАУЗЕРА ---
-        const ua = navigator.userAgent;
-        const lang = navigator.language;
-        const screenRes = `${screen.width} × ${screen.height}`;
-        const now = new Date().toLocaleString('ru-RU');
-        const loadTime = (performance.now() / 1000).toFixed(2) + ' сек';
+  const ADMIN_LOGIN = 'Semka';
+  const ADMIN_PASS = '3427';
 
-        // Определяем браузер
-        let browser = 'Неизвестно';
-        if (ua.indexOf('Chrome') > -1 && ua.indexOf('Edg') === -1) browser = 'Google Chrome';
-        else if (ua.indexOf('Firefox') > -1) browser = 'Mozilla Firefox';
-        else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) browser = 'Apple Safari';
-        else if (ua.indexOf('Edg') > -1) browser = 'Microsoft Edge';
-        else if (ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1) browser = 'Opera';
+  const defaultNFTs = [
+    { id: 1, name: 'Cosmic Dream #001', price: 4.20, emoji: '🌌', gradient: 'linear-gradient(135deg,#7B2CBF,#FFD93D)', tag: 'Legendary', badge: true },
+    { id: 2, name: 'Golden Ape #042',   price: 2.85, emoji: '🐵', gradient: 'linear-gradient(135deg,#FFD93D,#9D4EDD)', tag: 'Rare', badge: true },
+    { id: 3, name: 'Purple Crystal',    price: 1.95, emoji: '💎', gradient: 'linear-gradient(135deg,#3C096C,#C77DFF)', tag: 'Epic', badge: false },
+    { id: 4, name: 'Neon Tiger',        price: 3.60, emoji: '🐯', gradient: 'linear-gradient(135deg,#FFE66D,#7B2CBF)', tag: 'Rare', badge: false },
+    { id: 5, name: 'Astral Phoenix',    price: 5.10, emoji: '🔥', gradient: 'linear-gradient(135deg,#9D4EDD,#FFD93D,#7B2CBF)', tag: 'Mythic', badge: true },
+    { id: 6, name: 'Lunar Wolf',        price: 2.30, emoji: '🐺', gradient: 'linear-gradient(135deg,#240046,#FFD93D)', tag: 'Epic', badge: false },
+    { id: 7, name: 'Cyber Samurai',     price: 3.99, emoji: '⚔️', gradient: 'linear-gradient(135deg,#7B2CBF,#FFD93D)', tag: 'Rare', badge: false },
+    { id: 8, name: 'Golden Butterfly',  price: 1.75, emoji: '🦋', gradient: 'linear-gradient(135deg,#FFD93D,#9D4EDD)', tag: 'Uncommon', badge: false }
+  ];
 
-        // Определяем ОС
-        let os = 'Неизвестно';
-        if (ua.indexOf('Windows NT 10.0') > -1) os = 'Windows 10/11';
-        else if (ua.indexOf('Windows NT 6.1') > -1) os = 'Windows 7';
-        else if (ua.indexOf('Mac OS X') > -1) os = 'macOS';
-        else if (ua.indexOf('Linux') > -1) os = 'Linux (Android?)';
-        else if (ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1) os = 'iOS';
+  let nfts = [];
+  let isAdmin = false;
 
-        // Заполняем поля
-        document.getElementById('browser').textContent = browser;
-        document.getElementById('os').textContent = os;
-        document.getElementById('screen').textContent = screenRes;
-        document.getElementById('time').textContent = now;
-        document.getElementById('lang').textContent = lang;
-        document.getElementById('ua').textContent = ua;
-        document.getElementById('loadtime').textContent = loadTime;
-        document.getElementById('referrer').textContent = document.referrer || 'Прямой переход';
+  function loadNFTs() {
+    const saved = localStorage.getItem('nft_galaxy_collection');
+    if (saved) {
+      try { nfts = JSON.parse(saved); return; } catch(e) {}
+    }
+    nfts = [...defaultNFTs];
+  }
 
-        // Куки
-        document.getElementById('cookies').textContent = document.cookie || 'Нет куки (или они отключены)';
+  function saveNFTs() {
+    localStorage.setItem('nft_galaxy_collection', JSON.stringify(nfts));
+  }
 
-        // --- IP-АДРЕС ЧЕРЕЗ ВНЕШНИЙ API (БЕСПЛАТНЫЙ) ---
-        async function getIP() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                document.getElementById('ip').textContent = data.ip;
+  function renderNFTs() {
+    const grid = document.getElementById('nftGrid');
+    grid.innerHTML = nfts.map(n => `
+      <div class="nft-card" onclick="openNftModal(${n.id})">
+        ${n.badge ? '<div class="nft-badge">⭐ TOP</div>' : ''}
+        <div class="nft-image">
+          <div class="gradient-bg" style="background:${n.gradient}"></div>
+          <div class="emoji">${n.emoji}</div>
+        </div>
+        <div class="nft-info">
+          <div class="nft-name">${escapeHtml(n.name)}</div>
+          <div class="nft-meta">
+            <span class="nft-price">${n.price} ETH</span>
+            <span class="nft-tag">${escapeHtml(n.tag || 'NFT')}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
 
-                // Дополнительно — страна по IP (через второй API)
-                try {
-                    const geoRes = await fetch(`https://ipapi.co/${data.ip}/country_name/`);
-                    const country = await geoRes.text();
-                    document.getElementById('country').textContent = country || 'Не определено';
-                } catch {
-                    document.getElementById('country').textContent = 'Не определено (гео-API)';
-                }
-            } catch {
-                document.getElementById('ip').textContent = 'Не удалось определить (API недоступен)';
-                document.getElementById('country').textContent = 'Не определено';
-            }
-        }
+    document.getElementById('statCount').textContent = nfts.length;
+    document.getElementById('statOwners').textContent = Math.max(1, Math.round(nfts.length * 0.65));
+    document.getElementById('statEth').textContent = nfts.reduce((s, n) => s + parseFloat(n.price || 0), 0).toFixed(1);
+  }
 
-        getIP();
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
-        // Имитация записи в лог (только для демонстрации)
-        console.log('[УЧЕБНЫЙ СТЕНД] Собраны данные посетителя:');
-        console.log({
-            ip: document.getElementById('ip').textContent,
-            browser: browser,
-            os: os,
-            screen: screenRes,
-            time: now,
-            userAgent: ua
-        });
+  // Модалка NFT
+  function openNftModal(id) {
+    const n = nfts.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('modalName').textContent = n.name;
+    document.getElementById('modalPrice').textContent = n.price + ' ETH';
+    document.getElementById('modalEmoji').textContent = n.emoji;
+    document.getElementById('modalGradient').style.background = n.gradient;
+    document.getElementById('nftModal').classList.add('active');
+  }
 
-        console.log('%c⚠️ ЭТО УЧЕБНЫЙ СТЕНД. Данные никуда не отправляются.', 'color: #ff6b35; font-size: 16px; font-weight: bold;');
-    })();
+  function closeNftModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    document.getElementById('nftModal').classList.remove('active');
+  }
+
+  // Админ вход
+  function openAdminModal() {
+    if (isAdmin) { showAdminPanel(); return; }
+    document.getElementById('adminModal').classList.add('active');
+    document.getElementById('adminLogin').value = '';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('errorMsg').textContent = '';
+    setTimeout(() => document.getElementById('adminLogin').focus(), 100);
+  }
+
+  function closeAdminModal() {
+    document.getElementById('adminModal').classList.remove('active');
+  }
+
+  function tryLogin() {
+    const login = document.getElementById('adminLogin').value.trim();
+    const pass = document.getElementById('adminPass').value;
+
+    if (login === ADMIN_LOGIN && pass === ADMIN_PASS) {
+      isAdmin = true;
+      closeAdminModal();
+      showAdminPanel();
+      toast('Добро пожаловать, ' + ADMIN_LOGIN + '! 💜');
+    } else {
+      document.getElementById('errorMsg').textContent = '❌ Неверный логин или пароль';
+    }
+  }
+
+  function showAdminPanel() {
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('active');
+    renderAdminList();
+    window.scrollTo(0, 0);
+  }
+
+  function logout() {
+    isAdmin = false;
+    document.getElementById('adminPanel').classList.remove('active');
+    document.getElementById('mainContent').style.display = 'block';
+    goHome();
+    toast('Вы вышли из админ-панели');
+  }
+
+  function goHome() {
+    document.getElementById('adminPanel').classList.remove('active');
+    document.getElementById('mainContent').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Управление NFT
+  function renderAdminList() {
+    const list = document.getElementById('adminList');
+    document.getElementById('adminCount').textContent = nfts.length;
+
+    if (nfts.length === 0) {
+      list.innerHTML = '<p style="color:#8a72b8;text-align:center;padding:30px;">Коллекция пуста. Добавьте первый NFT выше ☝️</p>';
+      return;
+    }
+
+    list.innerHTML = nfts.map(n => `
+      <div class="admin-list-item">
+        <div class="info">
+          <div class="mini-emoji" style="background:${n.gradient}">${n.emoji}</div>
+          <div>
+            <div class="name">${escapeHtml(n.name)}</div>
+            <div class="price">${n.price} ETH • ${escapeHtml(n.tag || 'NFT')}</div>
+          </div>
+        </div>
+        <button class="delete-btn" onclick="deleteNFT(${n.id})">Удалить</button>
+      </div>
+    `).join('');
+  }
+
+  function addNFT() {
+    const name = document.getElementById('newName').value.trim();
+    const price = document.getElementById('newPrice').value.trim();
+    const emoji = document.getElementById('newEmoji').value.trim() || '🎨';
+    const gradient = document.getElementById('newGradient').value;
+    const tag = document.getElementById('newTag').value.trim() || 'NFT';
+
+    if (!name) { toast('⚠️ Введите название'); return; }
+    if (!price || parseFloat(price) < 0) { toast('⚠️ Введите цену'); return; }
+
+    const newNFT = {
+      id: Date.now(),
+      name: name,
+      price: parseFloat(price),
+      emoji: emoji,
+      gradient: gradient,
+      tag: tag,
+      badge: false
+    };
+
+    nfts.unshift(newNFT);
+    saveNFTs();
+    renderNFTs();
+    renderAdminList();
+
+    document.getElementById('newName').value = '';
+    document.getElementById('newPrice').value = '';
+    document.getElementById('newEmoji').value = '';
+    document.getElementById('newTag').value = '';
+
+    toast('✅ NFT добавлен!');
+  }
+
+  function deleteNFT(id) {
+    if (!confirm('Удалить этот NFT?')) return;
+    nfts = nfts.filter(n => n.id !== id);
+    saveNFTs();
+    renderNFTs();
+    renderAdminList();
+    toast('🗑️ NFT удалён');
+  }
+
+  // Тост
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  // Инициализация
+  loadNFTs();
+  renderNFTs();
+  renderAdminList();
+
+  // Enter в админ-модалке
+  document.getElementById('adminPass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryLogin();
+  });
+  document.getElementById('adminLogin').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('adminPass').focus();
+  });
+
+  // Esc закрывает модалки
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeNftModal();
+      closeAdminModal();
+    }
+  });
 </script>
 
 </body>
